@@ -7,7 +7,6 @@ import '/themes/styles/styles.dart';
 import '/views/screens/homescreen/HomeScreen.dart';
 import '/views/screens/homescreen/editProfile.dart';
 import '/views/screens/homescreen/settingsPage.dart';
-import '../../../repositories/foodie_repo.dart';
 import '../../../bloc/foodie_cubit.dart';
 
 class ProfilePage extends StatelessWidget {

@@ -79,7 +79,10 @@ class OpeningHoursCard extends StatelessWidget {
 class CategoryChip extends StatelessWidget {
   final String label;
 
-  const CategoryChip({super.key, required this.label});
+  const CategoryChip({
+    super.key, 
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +128,14 @@ class CategoryChip extends StatelessWidget {
 
 
 class ReviewCard extends StatelessWidget {
-  const ReviewCard({super.key});
+  final String rating; // Parameter for rating
+  final int totalReviews; // Parameter for total number of reviews
+
+  const ReviewCard({
+    super.key,
+    required this.rating,
+    required this.totalReviews,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +197,7 @@ class ReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4.0),
                 Text(
-                  '4.7',
+                  rating,
                   style: bodyTextStyle.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: screenWidth * 0.04,
@@ -195,7 +205,7 @@ class ReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8.0),
                 Text(
-                  'Total 20 reviews',
+                  'Total $totalReviews reviews',
                   style: placeholderTextStyle.copyWith(
                     fontSize: screenWidth * 0.035, 
                   ),
@@ -302,6 +312,45 @@ class RestaurantViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+      return buildRestaurantView(
+        context: context,
+        restaurantName: 'Hichem cook pizza',
+        description: 'Maecenas sed diam eget risus varius...',
+        imagePath: 'assets/images/hichamcookpizza.jpg',
+        rating: 4.7,
+        location: 'Cheraga',
+        pricing: '\$\$\$',
+        categories: ['Fast Food', 'Vegetarian'],
+        dietaryOptions: ['All', 'Vegetarian', 'Vegan'],
+        specialFeatures: ['All', 'Family friendly', 'Take out'],
+        menuItems: [
+          {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
+          {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
+        ],
+        openingHours: {
+          'Sunday': '9:00 AM - 10:00 PM',
+          'Monday': '9:00 AM - 10:00 PM',
+          'Tuesday': '9:00 AM - 10:00 PM',
+        },
+    );
+  }
+}
+
+Widget buildRestaurantView({
+  required BuildContext context,
+  required String restaurantName,
+  required String description,
+  required String imagePath,
+  required double rating,
+  required String location,
+  required String pricing,
+  required List<String> categories,
+  required List<String> dietaryOptions,
+  required List<String> specialFeatures,
+  required List<Map<String, String>> menuItems,
+  required Map<String, String> openingHours,
+
+}) {
     return Scaffold(
       backgroundColor: whiteColor,
       appBar: PreferredSize(
@@ -344,7 +393,7 @@ class RestaurantViewPage extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24.0),
                   child: Image.asset(
-                    'assets/images/hichamcookpizza.jpg',
+                    imagePath,
                     height: 150,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -353,11 +402,10 @@ class RestaurantViewPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16.0),
-
             Padding(
               padding: horizontalPadding,
               child: Text(
-                'Hichem cook pizza',
+                restaurantName,
                 style: headlineStyle.copyWith(
                   fontSize: 24.0,
                 ),
@@ -367,7 +415,7 @@ class RestaurantViewPage extends StatelessWidget {
             Padding(
               padding: horizontalPadding,
               child: Text(
-                'Maecenas sed diam eget risus varius blandit sit amet non magna. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.',
+                description,
                 style: bodyTextStyle.copyWith(
                   fontSize: 14.0,
                   color: darkGrayColor,
@@ -395,7 +443,7 @@ class RestaurantViewPage extends StatelessWidget {
                             const Icon(Icons.star, color: darkOrangeColor, size: 20),
                             const SizedBox(width: 4),
                             Text(
-                            '4.7',
+                            '$rating',
                             style: headlineStyle.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -424,7 +472,7 @@ class RestaurantViewPage extends StatelessWidget {
                           const Icon(Icons.location_on, color: darkOrangeColor, size: 20),
                           const SizedBox(width: 4),
                           Text(
-                            'Cheraga',
+                            location,
                             style: bodyTextStyle.copyWith(
                               color: darkGrayColor,
                             ),
@@ -459,7 +507,7 @@ class RestaurantViewPage extends StatelessWidget {
                           const Icon(Icons.star, color: darkOrangeColor, size: 20),
                           const SizedBox(width: 4),
                           Text(
-                            '3.5',
+                            '$rating',
                             style: headlineStyle.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -471,7 +519,7 @@ class RestaurantViewPage extends StatelessWidget {
                           const Icon(Icons.location_on, color: darkOrangeColor, size: 20),
                           const SizedBox(width: 4),
                           Text(
-                            'Cheraga',
+                            location,
                             style: bodyTextStyle.copyWith(
                               color: darkGrayColor,
                             ),
@@ -481,7 +529,7 @@ class RestaurantViewPage extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            '\$\$\$',
+                            pricing,
                             style: bodyTextStyle.copyWith(
                               color: darkOrangeColor,
                             ),
@@ -523,7 +571,12 @@ class RestaurantViewPage extends StatelessWidget {
                 ],
               ),
             ),
-
+          const SizedBox(height: 16.0),
+          _buildChipsSection('Category', categories),
+          const SizedBox(height: 16.0),
+          _buildChipsSection('DIETARY', dietaryOptions),
+          const SizedBox(height: 16.0),
+          _buildChipsSection('SPECIAL FEATURES', specialFeatures),
             const SizedBox(height: 16.0),
             Padding(
               padding: horizontalPadding,
@@ -562,55 +615,70 @@ class RestaurantViewPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16.0),
-            const SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  MenuCard(
-                    imagePath: 'assets/images/pizza.jpg',
-                    itemName: 'Pizza',
-                    price: '600',
+            SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: menuItems.map((item) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: MenuCard(
+                    imagePath: item['imagePath']!,
+                    itemName: item['itemName']!,
+                    price: item['price']!,
                   ),
-                  SizedBox(width: 16.0),
-                  MenuCard(
-                    imagePath: 'assets/images/pasta.jpg',
-                    itemName: 'Pasta',
-                    price: '1400',
-                  ),
-                  SizedBox(width: 16.0),
-                  MenuCard(
-                    imagePath: 'assets/images/caesarsalad.jpg',
-                    itemName: 'Caesar Salad',
-                    price: '750',
-                  ),
-
-
-                ],
-              ),
+                );
+              }).toList(),
             ),
+          ),
             const SizedBox(height: 16.0),
-            const Padding(
-              padding: horizontalPadding,
-              child: ReviewCard(),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: OpeningHoursCard(
-                openingHours: {
-                  'Sunday': '9:00 AM - 10:00 PM',
-                  'Monday': '9:00 AM - 10:00 PM',
-                  'Tuesday': '9:00 AM - 10:00 PM',
-                  'Wednesday': '9:00 AM - 10:00 PM',
-                  'Thursday': '9:00 AM - 10:00 PM',
-                  'Friday': '9:00 AM - 11:00 PM',
-                  'Saturday': '9:00 AM - 11:00 PM',
-                },
+            Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.download, color: Colors.white),
+              label: const Text(
+                'Download Menu',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                backgroundColor: lightOrangeColor,
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                shadowColor: darkOrangeColor,
+                elevation: 4.0,
+              ), onPressed: () {  },
             ),
+          ),
+          const SizedBox(height: 16.0),
+          Padding(
+            padding: horizontalPadding,
+            child: ReviewCard(rating: rating.toString(), totalReviews: 20),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: OpeningHoursCard(openingHours: openingHours),
+          ),
           ],
         ),
       ),
     );
   }
+
+Widget _buildChipsSection(String title, List<String> chips) {
+  return Padding(
+    padding: horizontalPadding,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: subheadingStyle.copyWith(color: Colors.black)),
+        const SizedBox(height: 8.0),
+        Wrap(
+          spacing: 10.0,
+          runSpacing: 8.0,
+          children: chips.map((label) => CategoryChip(label: label)).toList(),
+        ),
+      ],
+    ),
+  );
 }
+
 

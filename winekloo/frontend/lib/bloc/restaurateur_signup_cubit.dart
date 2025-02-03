@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/restaurateur_model.dart';
 import '/repositories/restaurateur_repo.dart';
-import 'package:intl/intl.dart';
 
 class SignupState {
   final int currentStep;
