@@ -16,11 +16,6 @@ import '../../../bloc/foodie_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(
-    url: 'https://grngcgspcdqsoainkmdh.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdybmdjZ3NwY2Rxc29haW5rbWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NTAyNTQsImV4cCI6MjA1MDUyNjI1NH0.fy8onyDnoeCSAQ6Dww5qvXF7GsDXG-s51iEewu8KECk',
-  );
   runApp(
      const MainApp(),
   );

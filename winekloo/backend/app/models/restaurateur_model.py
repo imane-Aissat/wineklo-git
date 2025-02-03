@@ -3,28 +3,29 @@ from app.db import db
 class Restaurateur(db.Model):
     __tablename__ = 'restaurateur'
 
-    restaurateur_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    dining_type = db.Column(db.String(255), nullable=True)
-    name = db.Column(db.String(255), nullable=True)
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    phone_number = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    location = db.Column(db.String(255), nullable=True)
-    photo = db.Column(db.String(255), nullable=True)
-    working_hours = db.Column(db.JSON, nullable=True)
-    working_days = db.Column(db.JSON, nullable=True)
-    description = db.Column(db.String(1000), nullable=True)
-    rating_value_average = db.Column(db.Float, nullable=True)
-    menu_file_pdf = db.Column(db.String(255), nullable=True)
-    restaurateur_categories = db.Column(db.Integer, nullable=True)
-    restaurateur_preferences = db.Column(db.Integer, nullable=True)
-    restaurateur_special_features = db.Column(db.Integer, nullable=True)
-    restaurateur_pricing = db.Column(db.Integer, nullable=True)
+    restaurateur_id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, name="RestaurateurID")
+    dining_type = db.Column(db.Text, nullable=True, name="DiningType")
+    name = db.Column(db.Text, nullable=True, name="Name")
+    email = db.Column(db.Text, nullable=False, name="Email")
+    phone_number = db.Column(db.Text, nullable=False, name="PhoneNumber")
+    password = db.Column(db.Text, nullable=False, name="Password")
+    location = db.Column(db.Text, nullable=True, name="Location")
+    photo = db.Column(db.Text, nullable=True, name="Photo")
+    working_hours = db.Column(db.JSON, nullable=True, name="WorkingHours")
+    working_days = db.Column(db.ARRAY(db.Text), nullable=True, name="WorkingDays")
+    description = db.Column(db.Text, nullable=True, name="Description")
+    rating_value_average = db.Column(db.Text, nullable=True, name="RatingValueAverage")
+    menu_file_pdf = db.Column(db.Text, nullable=True, name="MenuFilePDF")
+    restaurateur_categories = db.Column(db.BigInteger, db.ForeignKey('categories."CategoryID"', onupdate="CASCADE", ondelete="SET NULL"), nullable=True, name="Categories")
+    restaurateur_preferences = db.Column(db.BigInteger, db.ForeignKey('dietarypreferences."PreferenceID"', onupdate="CASCADE", ondelete="SET NULL"), nullable=True, name="DietaryPreferences")
+    restaurateur_special_features = db.Column(db.BigInteger, db.ForeignKey('specialfeatures."FeatureID"', onupdate="CASCADE", ondelete="SET NULL"), nullable=True, name="SpecialFeatures")
+    restaurateur_pricing = db.Column(db.BigInteger, db.ForeignKey('pricing."PricingID"', onupdate="CASCADE", ondelete="SET NULL"), nullable=True, name="Pricing")
+    verified = db.Column(db.Boolean, nullable=True, default=False, name="verified")
 
     def __init__(self, email, phone_number, password, dining_type=None, name=None, location=None, photo=None,
                  working_hours=None, working_days=None, description=None, rating_value_average=None,
                  menu_file_pdf=None, restaurateur_categories=None, restaurateur_preferences=None,
-                 restaurateur_special_features=None, restaurateur_pricing=None):
+                 restaurateur_special_features=None, restaurateur_pricing=None, verified=False):
         self.email = email
         self.phone_number = phone_number
         self.password = password
@@ -41,6 +42,7 @@ class Restaurateur(db.Model):
         self.restaurateur_preferences = restaurateur_preferences
         self.restaurateur_special_features = restaurateur_special_features
         self.restaurateur_pricing = restaurateur_pricing
+        self.verified = verified
 
     @staticmethod
     def from_json(json_data):
@@ -61,7 +63,8 @@ class Restaurateur(db.Model):
             restaurateur_categories=json_data.get('Categories'),
             restaurateur_preferences=json_data.get('DietaryPreferences'),
             restaurateur_special_features=json_data.get('SpecialFeatures'),
-            restaurateur_pricing=json_data.get('Pricing')
+            restaurateur_pricing=json_data.get('Pricing'),
+            verified=json_data.get('verified', False)
         )
 
     def to_json(self):
@@ -82,5 +85,6 @@ class Restaurateur(db.Model):
             'Categories': self.restaurateur_categories,
             'DietaryPreferences': self.restaurateur_preferences,
             'SpecialFeatures': self.restaurateur_special_features,
-            'Pricing': self.restaurateur_pricing
+            'Pricing': self.restaurateur_pricing,
+            'verified': self.verified
         }
