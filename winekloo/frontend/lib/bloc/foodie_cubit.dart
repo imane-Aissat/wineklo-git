@@ -6,28 +6,25 @@ import '../models/foodie_model.dart';
 class FoodieCubit extends Cubit<Foodie?> {
   FoodieCubit() : super(null);
 
-  // The base URL for your Flask API
-  static const String baseUrl = "http://127.0.0.1:5000";  // Change this URL based on where your Flask app is hosted
+  static const String baseUrl = "http://127.0.0.1:5000";  
 
-  // Method to fetch foodie profile from backend
   Future<void> loadProfile(int foodieID) async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/foodie/$foodieID"));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        final foodie = Foodie.fromJson(data);  // Assuming your Foodie model has a fromJson constructor
-        emit(foodie);  // Update the state with the fetched foodie profile
+        final foodie = Foodie.fromJson(data); 
+        emit(foodie); 
       } else {
-        emit(null);  // Handle error, no data found
+        emit(null);  
       }
     } catch (e) {
       print("Error fetching profile: $e");
-      emit(null);  // Handle connection or other errors
+      emit(null);  
     }
   }
 
-  // Method to update foodie profile, for instance after editing details
   Future<void> updateFoodieDetails({String? fullname, String? email, String? phoneNumber}) async {
     final currentFoodie = state;
     if (currentFoodie == null) return;
@@ -35,7 +32,7 @@ class FoodieCubit extends Cubit<Foodie?> {
     if (fullname == currentFoodie.fullname &&
         email == currentFoodie.email &&
         phoneNumber == currentFoodie.phoneNumber) {
-      return;  // No changes to save
+      return;
     }
 
     final updatedFoodie = Foodie(
@@ -53,52 +50,49 @@ class FoodieCubit extends Cubit<Foodie?> {
       fullname: fullname ?? currentFoodie.fullname,
     );
 
-    // You would call an API endpoint here to update the foodie in the database
-    // Example:
+  
     final response = await http.put(
       Uri.parse("$baseUrl/foodie/update/${updatedFoodie.foodieID}"),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode(updatedFoodie.toJson()),  // Assuming you have a toJson() method
+      body: jsonEncode(updatedFoodie.toJson()),  
     );
 
     if (response.statusCode == 200) {
-      emit(updatedFoodie);  // Update state with the new foodie data
+      emit(updatedFoodie); 
     } else {
       print("Error updating profile");
     }
   }
 
-  // Method to save profile (for example after editing)
+
   Future<void> saveProfile() async {
     final currentFoodie = state;
     if (currentFoodie != null) {
-      // Assuming you want to save the profile after editing
+
       final response = await http.put(
         Uri.parse("$baseUrl/foodie/update/${currentFoodie.foodieID}"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(currentFoodie.toJson()),  // Send current foodie data
+        body: jsonEncode(currentFoodie.toJson()),  
       );
 
       if (response.statusCode == 200) {
-        emit(currentFoodie);  // Update state if the update was successful
+        emit(currentFoodie);  
       } else {
         print("Error saving profile");
       }
     }
   }
 
-  // Method to delete profile
   Future<void> deleteProfile(int foodieID) async {
     final response = await http.delete(Uri.parse("$baseUrl/foodie/delete/$foodieID"));
 
     if (response.statusCode == 200) {
-      emit(null);  // Clear the current foodie profile from state
+      emit(null);  
     } else {
       print("Error deleting profile");
     }
   }
 
-  // Method for logging out (just clears state)
   Future<void> logout() async {
     emit(null);
   }

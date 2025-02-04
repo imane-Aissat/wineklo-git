@@ -12,17 +12,6 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Supabase Configuration
-    SUPABASE_PROJECT_URL = os.getenv("SUPABASE_PROJECT_URL")
-    SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
-
-    if not SUPABASE_PROJECT_URL or not SUPABASE_API_KEY:
-        raise ValueError("Supabase credentials are missing")
-    else:
-        print("Supabase credentials found")
-
-    app.supabase = create_client(SUPABASE_PROJECT_URL, SUPABASE_API_KEY)
-
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.grngcgspcdqsoainkmdh:winekloslaya@aws-0-eu-west-3.pooler.supabase.com:5432/postgres'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)

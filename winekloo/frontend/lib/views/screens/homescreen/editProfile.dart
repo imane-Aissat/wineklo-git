@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/bloc/foodie_cubit.dart';
-import '/repositories/foodie_repo.dart';
 import '/models/foodie_model.dart';
 
 class EditProfile extends StatefulWidget {
@@ -42,10 +41,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     
-    return BlocProvider(
-      create: (context) => FoodieCubit(FoodieRepository())
-        ..loadProfile(widget.foodieID), 
-      child: Scaffold(
+    return Scaffold(
         backgroundColor: whiteColor,
         appBar: AppBar(
           centerTitle: true,
@@ -145,7 +141,6 @@ class _EditProfileState extends State<EditProfile> {
             ),
           ),
         ),
-      ),
     );
   }
 

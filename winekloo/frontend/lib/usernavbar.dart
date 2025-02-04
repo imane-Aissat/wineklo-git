@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/bloc/foodie_cubit.dart';
-import 'package:userworkside/repositories/foodie_repo.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/screens/homescreen/HomeScreen.dart';
 import '/views/screens/homescreen/Search.dart';
@@ -28,7 +27,7 @@ class _UserNavBarState extends State<UserNavBar> {
   @override
   Widget build(BuildContext context) {
         return BlocProvider(
-          create: (context) => FoodieCubit(FoodieRepository()),
+          create: (context) => FoodieCubit(),
           child: Scaffold(
           body: screens[_selectedindex],
           

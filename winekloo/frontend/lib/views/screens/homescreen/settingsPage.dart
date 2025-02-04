@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/bloc/foodie_cubit.dart';
-import 'package:userworkside/repositories/foodie_repo.dart';
 import 'package:userworkside/views/screens/homescreen/privacySettings.dart';
 import 'package:userworkside/views/screens/homescreen/resetPassword.dart';
 import '/views/screens/login/loginPage.dart';
@@ -118,9 +117,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onPressed: () {
                   showDialog(
                     context: context, 
-                    builder: (_) => BlocProvider(
-                      create: (context) => FoodieCubit(FoodieRepository()),
-                      child: AlertDialog(
+                    builder: (_) => AlertDialog(
                     title: const Text("Delete Account", style: blackSubHeadlineStyle,),
                     content: const Text("Are you sure you want to delete your account ?"),
                     actions: [
@@ -141,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: const Text('Delete')
                       ),
                     ],
-                  ))); 
+                  )); 
                 }, 
               style: primaryDeleteStyle,
               child: const Text('Delete your account', style: buttonTextStyle,)),

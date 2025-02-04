@@ -10,8 +10,6 @@ import '/views/screens/signup/signupPage.dart';
 import '/views/screens/signup/foodieSignup.dart';
 import '/views/screens/signup/restauSignup.dart';
 import '/views/screens/food_managment/restaunavbar.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../repositories/foodie_repo.dart';
 import '../../../bloc/foodie_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +26,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
      return MultiBlocProvider(
       providers: [
-        BlocProvider<FoodieCubit>(create: (_) => FoodieCubit(FoodieRepository())),
+        BlocProvider<FoodieCubit>(create: (_) => FoodieCubit()),
 
       ],
       child: MaterialApp(
