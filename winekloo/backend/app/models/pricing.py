@@ -9,3 +9,9 @@ class Pricing(db.Model):
 
     def __repr__(self):
         return f"<Pricing {self.PriceValue}>"
+
+    def to_json(self):
+        return {
+            "PricingID": self.PricingID,
+            "PriceValue": float(self.PriceValue) if self.PriceValue else None
+        }

@@ -13,3 +13,14 @@ class Menu(db.Model):
 
     def __repr__(self):
         return f"<Menu {self.Name}>"
+
+    def to_json(self):
+        return {
+            "MenuID": self.MenuID,
+            "RestaurateurID": self.RestaurateurID,
+            "Name": self.Name,
+            "Price": self.Price,
+            "Details": self.Details,
+            "Category": self.Category,
+            "Picture": self.Picture
+        }

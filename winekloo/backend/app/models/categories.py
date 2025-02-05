@@ -8,3 +8,9 @@ class Categories(db.Model):
 
     def __repr__(self):
         return f"<Categories {self.CategoryName}>"
+
+    def to_json(self):
+        return {
+            "CategoryID": self.CategoryID,
+            "CategoryName": self.CategoryName
+        }
