@@ -4,9 +4,14 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from supabase import create_client, Client
 from app.routes.foodie_routes import foodie_bp
+from app.routes.restaurateur_routes import restaurateur_bp
 from datetime import datetime
 from sqlalchemy import text
 from app.db import db
+from app.routes.restaurateur_routes import restaurateur_bp
+
+
+
 
 def create_app():
     app = Flask(__name__)
@@ -26,5 +31,6 @@ def create_app():
             print("❌ Failed to connect to the PostgreSQL database:", e)
 
     app.register_blueprint(foodie_bp)
+    app.register_blueprint(restaurateur_bp)
 
     return app

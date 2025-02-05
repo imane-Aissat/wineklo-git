@@ -1,4 +1,5 @@
 from app.db import db
+from app.models.restaurateur_model import Restaurateur
 
 class RestaurateurRepository:
     
