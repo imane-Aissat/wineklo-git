@@ -17,6 +17,7 @@ from app.routes.pricing_routes import pricing_bp
 from app.routes.specialfeatures_routes import specialfeatures_bp
 
 def create_app():
+    
     app = Flask(__name__)
     CORS(app)
 

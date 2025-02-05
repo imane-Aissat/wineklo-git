@@ -18,8 +18,7 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController usernameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
-
-  late Foodie currentFoodie; 
+  Foodie? currentFoodie; // Nullable to avoid uninitialized usage
 
   @override
   void initState() {
@@ -27,6 +26,11 @@ class _EditProfileState extends State<EditProfile> {
     usernameController = TextEditingController();
     emailController = TextEditingController();
     phoneController = TextEditingController();
+
+    
+    Future.microtask(() {
+      context.read<FoodieCubit>().loadProfile(1);
+    });
   }
 
   @override
@@ -40,107 +44,109 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Scaffold(
-        backgroundColor: whiteColor,
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            'Profile Settings', 
-            style: blackSubHeadlineStyle.copyWith(fontSize: screenWidth * 0.05,),
-          ),
-          backgroundColor: whiteColor,
+      backgroundColor: whiteColor,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Profile Settings',
+          style: blackSubHeadlineStyle.copyWith(fontSize: screenWidth * 0.05),
         ),
-        body: SingleChildScrollView(
-          child: Center( 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min, 
-              children: [
-                BlocConsumer<FoodieCubit, Foodie?>(
-                  listener: (context, foodie) {
-                    if (foodie != null) {
+        backgroundColor: whiteColor,
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              BlocConsumer<FoodieCubit, Foodie?>(
+                listener: (context, foodie) {
+                  if (foodie != null) {
+                    setState(() {
                       currentFoodie = foodie;
                       usernameController.text = foodie.fullname ?? '';
                       emailController.text = foodie.email ?? '';
                       phoneController.text = foodie.phoneNumber ?? '';
-                    }
-                  },
-                  builder: (context, foodie) {
-                    if (foodie == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                    });
+                  }
+                },
+                builder: (context, foodie) {
+                  if (foodie == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: screenWidth * 0.12,
-                              backgroundColor: lightGrayColor,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: InkWell(
-                                onTap: () {}, 
-                                child: Container(
-                                  height: screenWidth * 0.08,
-                                  width: screenWidth * 0.08,
-                                  decoration: const BoxDecoration(
-                                    color: darkOrangeColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                    size: screenWidth * 0.04,
-                                  ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: screenWidth * 0.12,
+                            backgroundColor: lightGrayColor,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: InkWell(
+                              onTap: () {}, 
+                              child: Container(
+                                height: screenWidth * 0.08,
+                                width: screenWidth * 0.08,
+                                decoration: const BoxDecoration(
+                                  color: darkOrangeColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: screenWidth * 0.04,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                        textField(context, "USERNAME", usernameController),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                        textField(context, "EMAIL", emailController),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                        textField(context, "PHONE NUMBER", phoneController),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                        SizedBox(
-                          width: screenWidth * 0.8,
-                          height: MediaQuery.of(context).size.height * 0.07,
-                          child: ElevatedButton(
-                            style: primaryButtonStyle,
-                            onPressed: () async {
-                              context.read<FoodieCubit>().updateFoodieDetails(
-                                fullname: usernameController.text,
-                                email: emailController.text,
-                                phoneNumber: phoneController.text,
-                              );
-                                
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              "Save changes",
-                              style: whiteSubheadingStyle.copyWith(
-                                fontSize: screenWidth * 0.045,
-                              ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                      textField(context, "USERNAME", usernameController),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                      textField(context, "EMAIL", emailController),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                      textField(context, "PHONE NUMBER", phoneController),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                      SizedBox(
+                        width: screenWidth * 0.8,
+                        height: MediaQuery.of(context).size.height * 0.07,
+                        child: ElevatedButton(
+                          style: primaryButtonStyle,
+                          onPressed: () async {
+                            context.read<FoodieCubit>().updateFoodieDetails(
+                              fullname: usernameController.text,
+                              email: emailController.text,
+                              phoneNumber: phoneController.text,
+                            );
+
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Save changes",
+                            style: whiteSubheadingStyle.copyWith(
+                              fontSize: screenWidth * 0.045,
                             ),
                           ),
                         ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 

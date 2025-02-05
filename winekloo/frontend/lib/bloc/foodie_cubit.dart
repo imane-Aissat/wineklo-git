@@ -21,48 +21,42 @@ class FoodieCubit extends Cubit<Foodie?> {
       }
     } catch (e) {
       print("Error fetching profile: $e");
-      emit(null);  
+      emit(null);
     }
   }
 
   Future<void> updateFoodieDetails({String? fullname, String? email, String? phoneNumber}) async {
-    final currentFoodie = state;
-    if (currentFoodie == null) return;
+  final currentFoodie = state;
+  if (currentFoodie == null) return;
+  final updatedFoodie = {
+    "FoodieID": currentFoodie.foodieID,
+    "Email": email ?? currentFoodie.email,
+    "PhoneNumber": phoneNumber ?? currentFoodie.phoneNumber,
+    "Password": currentFoodie.password,
+    "Birthday": null,
+    "Gender": currentFoodie.gender,
+    "Wilaya": currentFoodie.wilaya,
+    "Photo": currentFoodie.photo,
+    "FoodieCategories": currentFoodie.foodieCategories,
+    "FoodiePreferences": currentFoodie.foodiePreferences,
+    "FoodiePricing": currentFoodie.foodiePricing,
+    "full_name": fullname ?? currentFoodie.fullname,
+  };
 
-    if (fullname == currentFoodie.fullname &&
-        email == currentFoodie.email &&
-        phoneNumber == currentFoodie.phoneNumber) {
-      return;
-    }
+  print(updatedFoodie);
 
-    final updatedFoodie = Foodie(
-      foodieID: currentFoodie.foodieID,
-      email: email ?? currentFoodie.email,
-      phoneNumber: phoneNumber ?? currentFoodie.phoneNumber,
-      password: currentFoodie.password,
-      birthday: currentFoodie.birthday,
-      gender: currentFoodie.gender,
-      wilaya: currentFoodie.wilaya,
-      photo: currentFoodie.photo,
-      foodieCategories: currentFoodie.foodieCategories,
-      foodiePreferences: currentFoodie.foodiePreferences,
-      foodiePricing: currentFoodie.foodiePricing,
-      fullname: fullname ?? currentFoodie.fullname,
-    );
+  final response = await http.post( 
+    Uri.parse("$baseUrl/foodie/updateprofile"),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode(updatedFoodie),
+  );
 
-  
-    final response = await http.put(
-      Uri.parse("$baseUrl/foodie/update/${updatedFoodie.foodieID}"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(updatedFoodie.toJson()),  
-    );
-
-    if (response.statusCode == 200) {
-      emit(updatedFoodie); 
-    } else {
-      print("Error updating profile");
-    }
+  if (response.statusCode == 200) {
+    emit(Foodie.fromJson(updatedFoodie));  
+  } else {
+    print("Error updating profile: ${response.body}");
   }
+}
 
 
   Future<void> saveProfile() async {
