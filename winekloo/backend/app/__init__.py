@@ -9,6 +9,7 @@ from sqlalchemy import text
 from app.db import db
 
 def create_app():
+    
     app = Flask(__name__)
     CORS(app)
 
