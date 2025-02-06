@@ -8,3 +8,9 @@ class SpecialFeatures(db.Model):
 
     def __repr__(self):
         return f"<SpecialFeatures {self.Feature}>"
+
+    def to_json(self):
+        return {
+            "FeatureID": self.FeatureID,
+            "Feature": self.Feature
+        }

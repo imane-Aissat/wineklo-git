@@ -1,7 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '/views/themes/styles/colors.dart';
-import '/views/themes/styles/styles.dart'; 
+import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
+import '../../../bloc/restaurateur_cubit.dart'; // Adjust the path accordingly
+import '../../../models/restaurateur.dart'; // Adjust the path accordingly
+
+class RestaurantViewPage extends StatelessWidget {
+  const RestaurantViewPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => RestaurateurCubit()..loadRestaurateur(9), // Load restaurateur ID 5
+      child: Scaffold(
+        body: BlocBuilder<RestaurateurCubit, Restaurateur?>(
+          builder: (context, restaurateur) {
+            if (restaurateur == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return buildRestaurantView(
+              context: context,
+              restaurantName: restaurateur.name ?? 'Unknown',
+              description: restaurateur.description ?? 'No description available',
+              imagePath: restaurateur.photo ?? 'assets/images/default.jpg',
+              rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
+              location: restaurateur.location ?? 'Unknown location',
+              pricing: getPricingSymbol(restaurateur.pricing),
+              categories: getCategoryList(restaurateur.categories),
+              dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
+              specialFeatures: getFeatureList(restaurateur.specialFeatures),
+              menuItems: [
+                {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
+                {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
+              ],
+              openingHours: convertWorkingHours(restaurateur.workingHours),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Map<String, String> convertWorkingHours(Map<String, dynamic>? workingHours) {
+  if (workingHours == null) return {};
+  return workingHours.map((key, value) => MapEntry(key, value.toString()));
+}
+
+
+  String getPricingSymbol(int? pricing) {
+    if (pricing == null) return '\$';
+    return '\$' * pricing;
+  }
+
+  List<String> getCategoryList(int? categories) {
+    return categories != null ? ['Category $categories'] : ['Unknown Category'];
+  }
+
+  List<String> getDietaryList(int? dietaryPreferences) {
+    return dietaryPreferences != null ? ['Dietary $dietaryPreferences'] : ['All'];
+  }
+
+  List<String> getFeatureList(int? specialFeatures) {
+    return specialFeatures != null ? ['Feature $specialFeatures'] : ['No special features'];
+  }
+}
 
 
 
@@ -309,34 +373,6 @@ class MenuCard extends StatelessWidget {
 
 
 
-class RestaurantViewPage extends StatelessWidget {
-  const RestaurantViewPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return buildRestaurantView(
-      context: context,
-      restaurantName: 'Hichem cook pizza',
-      description: 'Maecenas sed diam eget risus varius...',
-      imagePath: 'assets/images/hichamcookpizza.jpg',
-      rating: 4.7,
-      location: 'Cheraga',
-      pricing: '\$\$\$',
-      categories: ['Fast Food', 'Vegetarian'],
-      dietaryOptions: ['All', 'Vegetarian', 'Vegan'],
-      specialFeatures: ['All', 'Family friendly', 'Take out'],
-      menuItems: [
-        {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
-        {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
-      ],
-      openingHours: {
-        'Sunday': '9:00 AM - 10:00 PM',
-        'Monday': '9:00 AM - 10:00 PM',
-        'Tuesday': '9:00 AM - 10:00 PM',
-      },
-    );
-  }
-}
 
 Widget buildRestaurantView({
   required BuildContext context,

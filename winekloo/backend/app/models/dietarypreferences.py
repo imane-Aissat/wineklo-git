@@ -8,3 +8,9 @@ class DietaryPreferences(db.Model):
 
     def __repr__(self):
         return f"<DietaryPreferences {self.Preference}>"
+
+    def to_json(self):
+        return {
+            "PreferenceID": self.PreferenceID,
+            "Preference": self.Preference
+        }
