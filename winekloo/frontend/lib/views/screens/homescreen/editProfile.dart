@@ -18,7 +18,7 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController usernameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
-  Foodie? currentFoodie; // Nullable to avoid uninitialized usage
+  Foodie? currentFoodie; 
 
   @override
   void initState() {

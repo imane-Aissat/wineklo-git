@@ -40,4 +40,14 @@ def update_foodie():
     except Exception as e:
         print(f"Error: {e}")  
         return jsonify({"error": "Internal server error"}), 500
+    
+
+@foodie_bp.route('/foodie/delete/<int:id>', methods=['DELETE'])
+def delete_foodie(id):
+    try:
+        FoodieRepository.delete_foodie(id)
+        return jsonify({"message": "Profile updated successfully"}), 200
+    except Exception as e:
+        print(f"Error: {e}")  
+        return jsonify({"error": "Internal server error"}), 500
 
