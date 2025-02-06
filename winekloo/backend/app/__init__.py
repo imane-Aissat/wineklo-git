@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy import text
 from app.db import db
 
-# Import Blueprints
+
 from app.routes.foodie_routes import foodie_bp
 from app.routes.restaurateur_routes import restaurateur_bp
 from app.routes.categories_routes import categories_bp

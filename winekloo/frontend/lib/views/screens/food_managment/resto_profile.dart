@@ -5,6 +5,26 @@ import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
 import '../../../bloc/restaurateur_cubit.dart'; // Adjust the path accordingly
 import '../../../models/restaurateur.dart'; // Adjust the path accordingly
+import '../../../bloc/categories_cubit.dart'; // Adjust the path accordingly
+import '../../../models/categories_model.dart';
+import '../../../bloc/dietarypreferences_cubit.dart'; // Adjust the path accordingly
+import '../../../models/dietarypreferences_model.dart';
+
+import '../../../bloc/menu_cubit.dart'; // Adjust the path accordingly
+import '../../../models/menu_model.dart';
+import '../../../bloc/pricing_cubit.dart'; // Adjust the path accordingly
+import '../../../models/pricing_model.dart';
+import '../../../bloc/specialfeatures_cubit.dart'; // Adjust the path accordingly
+import '../../../models/specialfeatures_model.dart';
+
+
+
+
+
+
+
+
+
 
 class RestaurantViewPage extends StatelessWidget {
   const RestaurantViewPage({super.key});
@@ -28,7 +48,7 @@ class RestaurantViewPage extends StatelessWidget {
               rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
               location: restaurateur.location ?? 'Unknown location',
               pricing: getPricingSymbol(restaurateur.pricing),
-              categories: getCategoryList(restaurateur.categories),
+              categories: CategoriesCubit()..LoadCategoryById(restaurateur.categories),
               dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
               specialFeatures: getFeatureList(restaurateur.specialFeatures),
               menuItems: [
