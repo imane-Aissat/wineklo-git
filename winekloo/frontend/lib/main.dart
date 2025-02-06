@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:userworkside/bloc/restaurateurs_cubit.dart';
 import 'package:userworkside/usernavbar.dart'; 
 import '/views/screens/onBoarding/onBoardingPage.dart';
 import 'views/themes/styles/theme.dart';
@@ -27,7 +28,7 @@ class MainApp extends StatelessWidget {
      return MultiBlocProvider(
       providers: [
         BlocProvider<FoodieCubit>(create: (_) => FoodieCubit()),
-
+        BlocProvider<RestaurateursCubit>(create: (_) => RestaurateursCubit()),
       ],
       child: MaterialApp(
 

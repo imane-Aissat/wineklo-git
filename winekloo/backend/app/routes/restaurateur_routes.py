@@ -11,3 +11,13 @@ def get_restaurateur_by_id(id):
         return jsonify(restaurateur.to_json()), 200
     else:
         return jsonify({"error": "Restaurateur not found"}), 404
+    
+
+@restaurateur_bp.route('/all/restaurateurs/', methods = ['GET'])
+def get_all_restaurateurs():
+    restaurateurs = RestaurateurRepository.get_all_restaurateurs()
+    for restaurateur in restaurateurs:
+        print(restaurateur.to_json())
+    return jsonify([restaurateur.to_json() for restaurateur in restaurateurs]), 200
+
+               

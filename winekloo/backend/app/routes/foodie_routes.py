@@ -20,8 +20,6 @@ def update_foodie():
         foodie_data = request.get_json()
         print(foodie_data)
         foodie_id = foodie_data.get("FoodieID") 
-        print("wlh the id here:") 
-        print("wlh the id here:", foodie_id)
         if not foodie_id:
             return jsonify({"error": "FoodieID is required"}), 400
 
