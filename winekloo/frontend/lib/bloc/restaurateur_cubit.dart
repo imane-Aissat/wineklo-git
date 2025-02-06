@@ -25,21 +25,4 @@ class RestaurateurCubit extends Cubit<Restaurateur?> {
       emit(null); // Emit null if an error occurs
     }
   }
-
-  Future<void> loadAllRestaurateurs() async {
-    try {
-      final response = await http.get(Uri.parse("$baseUrl/all/restaurateurs/"));
-        
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final restaurateur = Restaurateur.fromJson(data);
-        emit(restaurateur); // Emit the fetched restaurateur
-      } else {
-        emit(null); // Emit null if the request fails
-      }
-    } catch (e) {
-      print("Error fetching restaurateur: $e");
-      emit(null); // Emit null if an error occurs
-    }
-  }
 }

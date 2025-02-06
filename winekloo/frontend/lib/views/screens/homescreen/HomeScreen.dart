@@ -1,18 +1,18 @@
-
 import 'package:flutter/material.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/homescreen/restau%20profile.dart';
 import '../../../bloc/foodie_cubit.dart';
+import '../../../bloc/restaurateurs_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/models/foodie_model.dart';
+import 'package:userworkside/models/restaurateur.dart';
 
 class homeScreen extends StatefulWidget {
-  const homeScreen ({super.key});
+  const homeScreen({super.key});
   @override
   State<homeScreen> createState() => _homeScreenState();
 }
-
 
 class _homeScreenState extends State<homeScreen> {
   @override
@@ -20,6 +20,9 @@ class _homeScreenState extends State<homeScreen> {
     super.initState();
     final foodieCubit = context.read<FoodieCubit>();
     foodieCubit.loadProfile(1);
+
+    final restaurateursCubit = context.read<RestaurateursCubit>();
+    restaurateursCubit.loadAllRestaurateurs(); 
   }
 
   @override
@@ -27,7 +30,9 @@ class _homeScreenState extends State<homeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    return BlocProvider(
+      create: (context) => RestaurateursCubit()..loadAllRestaurateurs(),
+      child:  Scaffold(
       backgroundColor: whiteColor,
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -99,13 +104,27 @@ class _homeScreenState extends State<homeScreen> {
               child: Text("Popular", style: blackHeadlineStyle),
             ),
             const SizedBox(height: 10.0),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: [
-                restaurantCard("assets/images/hichamcookpizza.jpg", "Hicham cook pizza", "Cheraga", "3.5", context),
-                restaurantCard("assets/images/hichamcookgrill.jpg", "Hicham cook grill", "Ouled fayet", "3.8", context),
-                restaurantCard("assets/images/citeasiatique.jpg", "la cité Asiatique", "Val d'Hydra", "4.1", context),
-              ]),
+            BlocBuilder<RestaurateursCubit, List<Restaurateur>?>(
+              builder: (context, restaurateursList) {
+                if (restaurateursList == null || restaurateursList.isEmpty) {
+                  return const CircularProgressIndicator();
+                }
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: restaurateursList.map((restau) {
+                      return restaurantCard(
+                        restau.photo ?? "no photo", 
+                        restau.name ?? "no name", 
+                        restau.location ?? "no location", 
+                        restau.ratingValueAverage.toString(), 
+                        context
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 25.0),
             const Padding(
@@ -124,7 +143,7 @@ class _homeScreenState extends State<homeScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget cuisineCard(String cuisineName, String picture) {
@@ -165,75 +184,72 @@ class _homeScreenState extends State<homeScreen> {
       ),
     );
   }
-}
 
-
-Widget restaurantCard(String picture, String restauName, String location, String rating, context) {
-
-  return InkWell(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) =>  const RestaurantViewPage())
-      );
-    },
-    child: Container(
-      padding: const EdgeInsets.only(left: 10),
-      height: 215,
-      width: 230,
-      child: Material(
-        color: whiteColor,
-        shadowColor: darkGrayColor,
-        borderRadius: BorderRadius.circular(10),
-        elevation: 4.0,
-        child: Column(
-          children: [
-            Container(
-              height: 150,
-              width: 230,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: lightGrayColor,
-                  width: 1,         
+  Widget restaurantCard(String picture, String restauName, String location, String rating, context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RestaurantViewPage())
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.only(left: 10),
+        height: 215,
+        width: 230,
+        child: Material(
+          color: whiteColor,
+          shadowColor: darkGrayColor,
+          borderRadius: BorderRadius.circular(10),
+          elevation: 4.0,
+          child: Column(
+            children: [
+              Container(
+                height: 150,
+                width: 230,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: lightGrayColor,
+                    width: 1,         
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.5), 
-                child: Image.asset(
-                  picture,
-                  fit: BoxFit.fill,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.5), 
+                  child: Image.asset(
+                    picture,
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
-            ),
-
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(restauName, style: blackBodyTextStyle),
-                        Text(location, style: grayBodyTextStyle),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(rating),
-                        const Icon(Icons.star_rate, color: darkOrangeColor),
-                      ],
-                    ),
-                  ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(restauName, style: blackBodyTextStyle),
+                          Text(location, style: grayBodyTextStyle),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(rating),
+                          const Icon(Icons.star_rate, color: darkOrangeColor),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
