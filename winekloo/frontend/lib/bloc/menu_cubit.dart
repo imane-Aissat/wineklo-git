@@ -96,38 +96,40 @@ class MenuCubit extends Cubit<List<Menu>> {
   }
 }
 
+// ✅ Update an existing menu item
+Future<void> updateMenu(Menu updatedMenu) async {
+  try {
+    final response = await http.put(
+      Uri.parse("$baseUrl/menu/update/${updatedMenu.menuID}"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(updatedMenu.toJson()),
+    );
 
-  // ✅ Update an existing menu item
-  Future<void> updateMenu(int menuID, Menu updatedMenu) async {
-    try {
-      final response = await http.put(
-        Uri.parse("$baseUrl/menu/$menuID"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(updatedMenu.toJson()),
-      );
-
-      if (response.statusCode == 200) {
-        fetchMenus();  // Refresh list
-      } else {
-        print("Error updating menu: ${response.body}");
-      }
-    } catch (e) {
-      print("Error updating menu: $e");
+    if (response.statusCode == 200) {
+      // Find the index of the updated item in the state list
+      final updatedList = state.map((menu) => menu.menuID == updatedMenu.menuID ? updatedMenu : menu).toList();
+      emit(updatedList);  // Emit the updated menu list
+    } else {
+      print("Error updating menu: ${response.body}");
     }
+  } catch (e) {
+    print("Error updating menu: $e");
   }
+}
 
-  // ✅ Delete a menu item
-  Future<void> deleteMenu(int menuID) async {
-    try {
-      final response = await http.delete(Uri.parse("$baseUrl/menu/$menuID"));
+// ✅ Delete a menu item
+Future<void> deleteMenu(int menuID) async {
+  try {
+    final response = await http.delete(Uri.parse("$baseUrl/menu/delete/$menuID"));
 
-      if (response.statusCode == 200) {
-        fetchMenus();  // Refresh list
-      } else {
-        print("Error deleting menu: ${response.body}");
-      }
-    } catch (e) {
-      print("Error deleting menu: $e");
+    if (response.statusCode == 200) {
+      final updatedList = state.where((menu) => menu.menuID != menuID).toList();
+      emit(updatedList);  // Remove deleted item from state
+    } else {
+      print("Error deleting menu: ${response.body}");
     }
+  } catch (e) {
+    print("Error deleting menu: $e");
   }
+}
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/views/screens/food_managment/edit_menu_item.dart';
 import '/views/screens/food_managment/add_new_item.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
@@ -159,6 +160,45 @@ subtitle: Column(
                     trailing: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert, color: Colors.black),
                       onSelected: (value) async {
+                        
+                        final foodCubit = context.read<MenuCubit>();
+                        if (value == 'Edit') {
+                          final editedItem = await Navigator.push<Menu>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditItemPage(existingItem: item),
+                            ),
+                          );
+                          if (editedItem != null) {
+                            try {
+                              await foodCubit.updateMenu(editedItem);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Item updated successfully')),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Error updating item')),
+                              );
+                            }
+                          }
+                        } else if (value == 'Delete') {
+                          try {
+                            await foodCubit.deleteMenu(item.menuID!);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Item deleted successfully')),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error deleting item: $e')),
+                            );
+                          }
+                        }
                         }
                     ,
                       itemBuilder: (context) => [
