@@ -15,7 +15,8 @@ from app.routes.dietarypreferences_routes import dietarypreferences_bp
 from app.routes.menu_routes import menu_bp
 from app.routes.pricing_routes import pricing_bp
 from app.routes.specialfeatures_routes import specialfeatures_bp
-
+from app.routes.reviews_routes import reviews_bp
+ 
 def create_app():
     
     app = Flask(__name__)
@@ -42,5 +43,7 @@ def create_app():
     app.register_blueprint(menu_bp)
     app.register_blueprint(pricing_bp)
     app.register_blueprint(specialfeatures_bp)
+    app.register_blueprint(reviews_bp)
+
 
     return app
