@@ -6,85 +6,7 @@ import '/views/themes/styles/styles.dart';
 
 
 
-class CategoriesSelection extends StatefulWidget {
-  const CategoriesSelection({super.key});
 
-  @override
-  _CategoriesSelectionState createState() => _CategoriesSelectionState();
-}
-
-class _CategoriesSelectionState extends State<CategoriesSelection> {
-  String? selectedCategory;
-
-  final List<String> categories = [
-    'ALL',
-    'TURKISH',
-    'CHINESE',
-    'ITALIAN',
-    'JAPANESE',
-    'SYRIAN',
-    'INDIAN',
-    'MEXICAN',
-    'OTHER',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'CATEGORIES',
-              style: subheadingStyle,
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  selectedCategory = null; 
-                });
-              },
-              child: const Text(
-                'CLEAR ALL',
-                style: TextStyle(color: blackColor),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16.0),
-        Wrap(
-          spacing: 12.0, 
-          runSpacing: 12.0, 
-          children: categories.map((category) {
-            final isSelected = selectedCategory == category;
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedCategory = category; 
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                decoration: BoxDecoration(
-                  color: isSelected ? darkOrangeColor : lightGrayColor,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Text(
-                  category,
-                  style: TextStyle(
-                    color: isSelected ? whiteColor : blackColor,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
 
 class RestaurantEditPage extends StatelessWidget {
   const RestaurantEditPage({super.key});
@@ -140,12 +62,13 @@ class RestaurantEditPage extends StatelessWidget {
             children: [
 
               const Text(
-                'RESTAURANT NAME',
+                'Name',
                 style: placeholderTextStyle,
               ),
               const SizedBox(height: 8.0),
               
-              DropdownButtonFormField<String>(
+              TextFormField(
+                initialValue: 'Default name',
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: lightGrayColor,
@@ -158,19 +81,8 @@ class RestaurantEditPage extends StatelessWidget {
                     borderSide: const BorderSide(color: darkOrangeColor),
                   ),
                 ),
-                items: ['Hichem cook']
-                    .map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value, style: bodyTextStyle),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  
-                },
               ),
               const SizedBox(height: 16.0),
-              
               const Text(
                 'LOCATION',
                 style: placeholderTextStyle,
@@ -282,55 +194,7 @@ class RestaurantEditPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16.0),
-              const CategoriesSelection(),
-              const SizedBox(height: 16.0),
-              const Text(
-                'UPLOAD PHOTO/VIDEO',
-                style: headlineStyle,
-              ),
-              const SizedBox(height: 8.0),
-              GestureDetector(
-                onTap: () {
-                 //adding the upload laterr
-                },
-                child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: lightGrayColor, style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: lightGrayColor,
-                        child: Icon(Icons.cloud_upload, color: darkOrangeColor),
-                      ),
-                      SizedBox(height: 8.0),
-                      Text('Add', style: TextStyle(color: darkGrayColor)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'DETAILS',
-                style: headlineStyle,
-              ),
-              const SizedBox(height: 8.0),
-              TextFormField(
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: lightGrayColor,
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter your details',
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 32.0),
+              
 
              
               Center(

@@ -24,4 +24,26 @@ class SpecialFeaturesCubit extends Cubit<List<SpecialFeatures>> {
       emit([]);
     }
   }
+   // New: Load SpecialFeatures by ID
+  Future<void> loadSpecialFeaturesById(int specialfeaturesId) async {
+    if (specialfeaturesId == 0) {
+      emit([]);
+      return;
+    }
+
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/specialfeatures/$specialfeaturesId"));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final features = SpecialFeatures.fromJson(data);
+        emit([features]);
+      } else {
+        emit([]);
+      }
+    } catch (e) {
+      print("Error fetching SpecialFeatures by ID: $e");
+      emit([]);
+    }
+  }
 }

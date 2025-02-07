@@ -1,23 +1,23 @@
 class DietaryPreferences {
   final int? preferenceID;
-  final String? preference;
+  final String? preferenceName;
 
   DietaryPreferences({
     this.preferenceID,
-    this.preference,
+    this.preferenceName,
   });
 
   factory DietaryPreferences.fromJson(Map<String, dynamic> json) {
     return DietaryPreferences(
       preferenceID: json['PreferenceID'],
-      preference: json['Preference'],
+      preferenceName: json['PreferenceName'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'PreferenceID': preferenceID,
-      'Preference': preference,
+      'PreferenceName': preferenceName,
     };
   }
 }
