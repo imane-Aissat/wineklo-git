@@ -129,7 +129,16 @@ Widget _buildFoodList({String? category}) {
                   
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(12.0),
-                     leading: Container(
+                     leading: item.picture != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              File(item.picture!),
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ): Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(

@@ -21,7 +21,7 @@ class FoodieRepository:
         return response.data if response.data else None
 
     def delete_foodie(foodie_id):
-        with db.session.begin():  # Use session to handle transactions
+        with db.session.begin():  
             stmt = delete(Foodie).where(Foodie.FoodieID == foodie_id)
             result = db.session.execute(stmt)
             db.session.commit()
@@ -35,8 +35,6 @@ class FoodieRepository:
 
     def update_foodie(foodie_id, updates):
         try:
-            print("Database Columns:", {column.name for column in Foodie.__table__.columns})
-            print("Updates Dictionary:", updates.keys())
             stmt = update(Foodie).where(Foodie.FoodieID == foodie_id).values(**updates)
             result = db.session.execute(stmt) 
             db.session.commit() 

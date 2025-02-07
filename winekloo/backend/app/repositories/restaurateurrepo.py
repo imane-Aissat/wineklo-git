@@ -13,8 +13,7 @@ class RestaurateurRepository:
 
     @staticmethod
     def get_all_restaurateurs():
-        response = db.table("restaurateur").select("*").execute()
-        return response.data if response.data else None
+        return Restaurateur.query.all()
 
     @staticmethod
     def delete_restaurateur(restaurateur_id):

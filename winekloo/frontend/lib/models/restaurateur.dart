@@ -7,8 +7,8 @@ class Restaurateur {
   final String? password;
   final String? location;
   final String? photo;
-  final Map<String, dynamic>? workingHours; // JSONB field
-  final List<String>? workingDays; // Array field
+  final Map<String, dynamic>? workingHours;
+  final List<String>? workingDays; 
   final String? description;
   final String? ratingValueAverage;
   final String? menuFilePDF;
@@ -49,8 +49,14 @@ class Restaurateur {
       password: json['Password'],
       location: json['Location'],
       photo: json['Photo'],
-      workingHours: json['WorkingHours'] != null ? Map<String, dynamic>.from(json['WorkingHours']) : null,
-      workingDays: json['WorkingDays'] != null ? List<String>.from(json['WorkingDays']) : null,
+      workingHours: json['WorkingHours'] != null 
+          ? (json['WorkingHours'] is Map<String, dynamic>
+              ? Map<String, dynamic>.from(json['WorkingHours']) 
+              : null) 
+          : null,
+      workingDays: json['WorkingDays'] != null 
+          ? List<String>.from(json['WorkingDays'] ?? []) 
+          : null,
       description: json['Description'],
       ratingValueAverage: json['RatingValueAverage'],
       menuFilePDF: json['MenuFilePDF'],

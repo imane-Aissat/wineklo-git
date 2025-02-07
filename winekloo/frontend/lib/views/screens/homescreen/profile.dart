@@ -10,8 +10,8 @@ import '/views/screens/homescreen/settingsPage.dart';
 import '../../../bloc/foodie_cubit.dart';
 
 class ProfilePage extends StatelessWidget {
+  
   const ProfilePage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -120,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const FavoritesPage()),
+                                  builder: (context) => FavoritesPage(foodieID: foodieProfile.foodieID ?? 0)),
                             );
                           },
                           child: Text(
@@ -137,12 +137,9 @@ class ProfilePage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        restaurantCard("assets/images/hichamcookpizza.jpg",
-                            "Hicham cook pizza", "Cheraga", "3.5", context),
-                        restaurantCard("assets/images/hichamcookgrill.jpg",
-                            "Hicham cook grill", "Ouled fayet", "3.8", context),
-                        restaurantCard("assets/images/citeasiatique.jpg",
-                            "la cité Asiatique", "Val d'Hydra", "4.1", context),
+                        Text("add here"),   
+                        Text("add here"), 
+                        Text("add here"),                           
                       ],
                     ),
                   ),
@@ -159,14 +156,8 @@ class ProfilePage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        restaurantCard("assets/images/hichamcookpizza.jpg",
-                            "Hicham cook pizza", "Cheraga", "3.5", context),
-                        restaurantCard("assets/images/hichamcookgrill.jpg",
-                            "Hicham cook grill", "Ouled fayet", "3.8", context),
-                        restaurantCard("assets/images/citeasiatique.jpg",
-                            "la cité Asiatique", "Val d'Hydra", "4.1", context),
-                        restaurantCard("assets/images/sushiball.png",
-                            "sushi ball", "Dely brahim", "3.8", context),
+                        Text("add here"),
+                        Text("add here"),          
                       ],
                     ),
                   ),
@@ -183,8 +174,7 @@ class ProfilePage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        restaurantCard("assets/images/sushiball.png",
-                            "sushi ball", "Dely brahim", "3.8", context),
+                        Text("add here"),     
                       ],
                     ),
                   ),

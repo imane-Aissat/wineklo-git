@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:userworkside/bloc/foodie_cubit.dart';
 import 'package:userworkside/views/screens/homescreen/privacySettings.dart';
 import 'package:userworkside/views/screens/homescreen/resetPassword.dart';
 import '/views/screens/login/loginPage.dart';
@@ -9,6 +8,8 @@ import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/homescreen/editProfile.dart';
 import '/views/screens/homescreen/help&Support.dart';
+import '../../../bloc/foodie_cubit.dart';
+import 'package:userworkside/models/foodie_model.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -23,8 +24,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return 
-      Scaffold(
+     return BlocProvider(
+      create: (context) => FoodieCubit()..loadProfile(1),
+      child: Scaffold(
       backgroundColor: whiteColor,
       appBar: AppBar(
           centerTitle: true,
@@ -34,7 +36,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           backgroundColor: whiteColor,
         ),
-      body: SingleChildScrollView(
+       
+      body: BlocBuilder<FoodieCubit, Foodie?>(
+          builder: (context, foodieProfile) {
+            if (foodieProfile == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -65,13 +73,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "imanaaa",
+                        foodieProfile.fullname ?? "Unnamed User",
                         style: blackBodyTextStyle.copyWith(
                           fontSize: screenWidth * 0.045,
                         ),
                       ),
                       Text(
-                        "imane.aissat@ensia.edu.dz",
+                        foodieProfile.email ?? "Unnamed User",
                         style: grayBodyTextStyle.copyWith(
                           fontSize: screenWidth * 0.04,
                         ),
@@ -146,8 +154,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-      ),
-    );
+      );}
+  )));
   }
 
   List<Widget> settingsPossible(BuildContext context, double screenWidth, double screenHeight) {

@@ -19,7 +19,7 @@ class _restoNavBarState extends State<restoNavBar> {
   List<Widget> screens = [
  
   
-  const RestaurantDashboardApp(), 
+  const RestaurantDashboardPage(), 
   ReviewsPage(),
   const FoodMenuPage(), 
   const RestaurantViewPage(), 
