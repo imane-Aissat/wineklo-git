@@ -1,67 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/models/reviews_model.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
+import '/bloc/reviews_cubit.dart'; 
 
-class userReviewPage extends StatelessWidget {
-  final List<Map<String, dynamic>> reviews = [
-    {
-      'name': 'RazaneeLag',
-      'review': 'Great experience! Highly recommended.',
-      'date': '2024-07-25',
-      'rating': 4.5,
-    },
-    {
-      'name': 'Khaddlastar',
-      'review': 'Excellent service and friendly staff.',
-      'date': '2024-07-20',
-      'rating': 4,
-    },
-    {
-      'name': 'imanaaa',
-      'review': 'The food was kinda cold but still great, will give it another try',
-      'date': '2024-07-15',
-      'rating': 3,
-    },
-    {
-      'name': 'SALAHH',
-      'review': 'Already recommended to my friends! lovely experience',
-      'date': '2024-07-10',
-      'rating': 4,
-    },
-  ];
+class UserReviewPage extends StatefulWidget {
+  final int restaurateurID;
 
-  userReviewPage({super.key});
+  const UserReviewPage({super.key, required this.restaurateurID});
+
+  @override
+  _UserReviewPageState createState() => _UserReviewPageState();
+}
+
+class _UserReviewPageState extends State<UserReviewPage> {
+  final TextEditingController commentController = TextEditingController();
+  int selectedRating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ReviewsCubit>().loadReviews(widget.restaurateurID);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController commentController = TextEditingController();
-    int selectedRating = 0;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Reviews', style: blackHeadlineStyle),
-            backgroundColor: whiteColor,
-            centerTitle: true,
-            leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                margin: const EdgeInsets.all(8.0),
-                decoration: const BoxDecoration(
-                  color: lightGrayColor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_back, color: blackColor),
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reviews', style: blackHeadlineStyle),
+        backgroundColor: whiteColor,
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            decoration: const BoxDecoration(
+              color: lightGrayColor,
+              shape: BoxShape.circle,
             ),
+            child: const Icon(Icons.arrow_back, color: blackColor),
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: defaultPadding,
-                  child: ListView.builder(
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: defaultPadding,
+              child: BlocBuilder<ReviewsCubit, List<Review>>(
+                builder: (context, reviews) {
+                  if (reviews.isEmpty) {
+                    return const Center(child: Text("No reviews available."));
+                  }
+                  return ListView.builder(
                     itemCount: reviews.length,
                     itemBuilder: (context, index) {
                       final review = reviews[index];
@@ -78,7 +70,9 @@ class userReviewPage extends StatelessWidget {
                                   radius: 30.0,
                                   backgroundColor: lightGrayColor,
                                   child: Text(
-                                    review['name']![0],
+                                    review.foodieName != null
+                                        ? review.foodieName![0]
+                                        : "?", 
                                     style: whiteHeadlineStyle.copyWith(fontSize: 24),
                                   ),
                                 ),
@@ -91,7 +85,7 @@ class userReviewPage extends StatelessWidget {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            review['name']!,
+                                            review.foodieName ?? "Anonymous",
                                             style: blackSubHeadlineStyle,
                                           ),
                                           PopupMenuButton<String>(
@@ -116,7 +110,7 @@ class userReviewPage extends StatelessWidget {
                                       Row(
                                         children: List.generate(5, (starIndex) {
                                           return Icon(
-                                            starIndex < review['rating']
+                                            starIndex < (review.rating ?? 0)  
                                                 ? Icons.star
                                                 : Icons.star_border,
                                             color: darkOrangeColor,
@@ -125,12 +119,12 @@ class userReviewPage extends StatelessWidget {
                                         }),
                                       ),
                                       const SizedBox(height: 4.0),
-                                      Text(review['review']!, style: bodyTextStyle),
+                                      Text(review.comment ?? "No comment", style: bodyTextStyle),
                                       const SizedBox(height: 8.0),
                                       Align(
                                         alignment: Alignment.bottomRight,
                                         child: Text(
-                                          review['date']!,
+                                          review.date ?? "",
                                           style: placeholderTextStyle,
                                         ),
                                       ),
@@ -143,78 +137,78 @@ class userReviewPage extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
-                ),
+                  );
+                },
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                color: lightGrayColor,
-                child: Column(
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            color: lightGrayColor,
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: commentController,
-                            decoration: InputDecoration(
-                              hintText: 'Add a comment...',
-                              hintStyle: placeholderTextStyle,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              filled: true,
-                              fillColor: whiteColor,
-                            ),
+                    Expanded(
+                      child: TextField(
+                        controller: commentController,
+                        decoration: InputDecoration(
+                          hintText: 'Add a comment...',
+                          hintStyle: placeholderTextStyle,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
                           ),
+                          filled: true,
+                          fillColor: whiteColor,
                         ),
-                        const SizedBox(width: 8.0),
-                        ElevatedButton(
-                          style: primaryButtonStyle,
-                          onPressed: () {
-                            if (commentController.text.isNotEmpty && selectedRating > 0) {
-                              reviews.add({
-                                'name': 'User',
-                                'review': commentController.text,
-                                'date': DateTime.now().toIso8601String().split('T')[0],
-                                'rating': selectedRating,
-                              });
-                              commentController.clear();
-                              selectedRating = 0;
-                              setState(() {});
-                            }
-                          },
-                          child: const Text('Add'),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 8.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (starIndex) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedRating = starIndex + 1;
-                            });
-                          },
-                          child: Icon(
-                            starIndex < selectedRating
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: darkOrangeColor,
-                            size: 30.0,
-                          ),
-                        );
-                      }),
+                    const SizedBox(width: 8.0),
+                    ElevatedButton(
+                      style: primaryButtonStyle,
+                      onPressed: () {
+                        if (commentController.text.isNotEmpty && selectedRating > 0) {
+                          context.read<ReviewsCubit>().addReview(
+                            foodieID: 1, 
+                            restaurateurID: widget.restaurateurID,
+                            comment: commentController.text,
+                            rating: selectedRating,
+                          );
+
+                          commentController.clear();
+                          setState(() {
+                            selectedRating = 0;
+                          });
+                        }
+                      },
+                      child: const Text('Add'),
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 8.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (starIndex) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedRating = starIndex + 1;
+                        });
+                      },
+                      child: Icon(
+                        starIndex < selectedRating ? Icons.star : Icons.star_border,
+                        color: darkOrangeColor,
+                        size: 30.0,
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

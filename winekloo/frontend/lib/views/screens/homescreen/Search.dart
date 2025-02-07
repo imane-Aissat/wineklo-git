@@ -211,7 +211,7 @@ class RestaurantCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context, 
-          MaterialPageRoute(builder: (context) => const RestaurantViewPage())
+          MaterialPageRoute(builder: (context) => const RestaurantViewPage(restaurateurID: 1,))
         );
       },
       child: Card(

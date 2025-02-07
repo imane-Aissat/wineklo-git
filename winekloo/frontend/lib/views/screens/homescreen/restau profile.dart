@@ -1,8 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:userworkside/views/screens/homescreen/menuUserView.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/views/screens/homescreen/reviewsUser.dart';
 import '/views/themes/styles/colors.dart';
-import '/views/themes/styles/styles.dart'; 
+import '/views/themes/styles/styles.dart';
+import '/views/screens/food_managment/my_reviews.dart';
+import '../../../bloc/restaurateur_cubit.dart'; 
+import '../../../models/restaurateur.dart'; 
+
+class RestaurantViewPage extends StatelessWidget {
+  final int restaurateurID; 
+
+  const RestaurantViewPage({super.key, required this.restaurateurID});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => RestaurateurCubit()..loadRestaurateur(restaurateurID), 
+      child: Scaffold(
+        body: BlocBuilder<RestaurateurCubit, Restaurateur?>(
+          builder: (context, restaurateur) {
+            if (restaurateur == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return buildRestaurantView(
+              restaurateurID: restaurateur.restaurateurID ?? 0,
+              context: context,
+              restaurantName: restaurateur.name ?? 'Unknown',
+              description: restaurateur.description ?? 'No description available',
+              imagePath: restaurateur.photo ?? 'assets/images/default.jpg',
+              rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
+              location: restaurateur.location ?? 'Unknown location',
+              pricing: getPricingSymbol(restaurateur.pricing),
+              categories: getCategoryList(restaurateur.categories),
+              dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
+              specialFeatures: getFeatureList(restaurateur.specialFeatures),
+              menuItems: [
+                {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
+                {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
+              ],
+              openingHours: convertWorkingHours(restaurateur.workingHours),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Map<String, String> convertWorkingHours(Map<String, dynamic>? workingHours) {
+  if (workingHours == null) return {};
+  return workingHours.map((key, value) => MapEntry(key, value.toString()));
+}
+
+
+  String getPricingSymbol(int? pricing) {
+    if (pricing == null) return '\$';
+    return '\$' * pricing;
+  }
+
+  List<String> getCategoryList(int? categories) {
+    return categories != null ? ['Category $categories'] : ['Unknown Category'];
+  }
+
+  List<String> getDietaryList(int? dietaryPreferences) {
+    return dietaryPreferences != null ? ['Dietary $dietaryPreferences'] : ['All'];
+  }
+
+  List<String> getFeatureList(int? specialFeatures) {
+    return specialFeatures != null ? ['Feature $specialFeatures'] : ['No special features'];
+  }
+}
 
 
 
@@ -75,12 +142,11 @@ class OpeningHoursCard extends StatelessWidget {
 
 
 
-
 class CategoryChip extends StatelessWidget {
-  final String label;
+  final String label; 
 
   const CategoryChip({
-    super.key, 
+    super.key,
     required this.label,
   });
 
@@ -114,7 +180,7 @@ class CategoryChip extends StatelessWidget {
           label,
           style: placeholderTextStyle.copyWith(
             color: darkGrayColor,
-            fontSize: screenWidth * 0.035, 
+            fontSize: screenWidth * 0.035,
           ),
         ),
       ),
@@ -127,14 +193,19 @@ class CategoryChip extends StatelessWidget {
 
 
 
+
+
+
 class ReviewCard extends StatelessWidget {
-  final String rating; // Parameter for rating
-  final int totalReviews; // Parameter for total number of reviews
+  final String rating;
+  final int totalReviews; 
+  final int restaurateurID;
 
   const ReviewCard({
     super.key,
     required this.rating,
     required this.totalReviews,
+    required this.restaurateurID,
   });
 
   @override
@@ -142,10 +213,10 @@ class ReviewCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      margin: EdgeInsets.all(screenWidth * 0.02), 
+      margin: EdgeInsets.all(screenWidth * 0.02),
       decoration: cardDecoration,
       child: Padding(
-        padding: EdgeInsets.all(screenWidth * 0.04), 
+        padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -156,7 +227,7 @@ class ReviewCard extends StatelessWidget {
                   'Reviews',
                   style: bodyTextStyle.copyWith(
                     color: darkOrangeColor,
-                    fontSize: screenWidth * 0.045, 
+                    fontSize: screenWidth * 0.045,
                   ),
                 ),
                 GestureDetector(
@@ -164,7 +235,7 @@ class ReviewCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => userReviewPage(),
+                        builder: (context) => UserReviewPage(restaurateurID: restaurateurID),
                       ),
                     );
                   },
@@ -174,13 +245,13 @@ class ReviewCard extends StatelessWidget {
                         'See All',
                         style: bodyTextStyle.copyWith(
                           color: darkOrangeColor,
-                          fontSize: screenWidth * 0.04, 
+                          fontSize: screenWidth * 0.04,
                         ),
                       ),
                       Icon(
                         Icons.arrow_forward,
                         color: darkOrangeColor,
-                        size: screenWidth * 0.04, 
+                        size: screenWidth * 0.04,
                       ),
                     ],
                   ),
@@ -193,11 +264,11 @@ class ReviewCard extends StatelessWidget {
                 Icon(
                   Icons.star,
                   color: darkOrangeColor,
-                  size: screenWidth * 0.05, 
+                  size: screenWidth * 0.05,
                 ),
                 const SizedBox(width: 4.0),
                 Text(
-                  rating,
+                  rating, // Use the rating parameter
                   style: bodyTextStyle.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: screenWidth * 0.04,
@@ -207,7 +278,7 @@ class ReviewCard extends StatelessWidget {
                 Text(
                   'Total $totalReviews reviews',
                   style: placeholderTextStyle.copyWith(
-                    fontSize: screenWidth * 0.035, 
+                    fontSize: screenWidth * 0.035,
                   ),
                 ),
               ],
@@ -218,6 +289,7 @@ class ReviewCard extends StatelessWidget {
     );
   }
 }
+
 
 
 
@@ -249,14 +321,14 @@ class MenuCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-       
+          
           ClipRRect(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(screenWidth * 0.02),
-            ),
+            ), 
             child: Image.asset(
               imagePath,
-              height: screenWidth * 0.3, 
+              height: screenWidth * 0.3,
               width: double.infinity,
               fit: BoxFit.fill,
             ),
@@ -274,7 +346,7 @@ class MenuCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4.0),
-        
+          
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
             child: Row(
@@ -291,7 +363,7 @@ class MenuCard extends StatelessWidget {
                   style: bodyTextStyle.copyWith(
                     color: darkOrangeColor,
                     fontWeight: FontWeight.bold,
-                    fontSize: screenWidth * 0.04,
+                    fontSize: screenWidth * 0.04, 
                   ),
                 ),
               ],
@@ -307,36 +379,9 @@ class MenuCard extends StatelessWidget {
 
 
 
-class RestaurantViewPage extends StatelessWidget {
-  const RestaurantViewPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-      return buildRestaurantView(
-        context: context,
-        restaurantName: 'Hichem cook pizza',
-        description: 'Maecenas sed diam eget risus varius...',
-        imagePath: 'assets/images/hichamcookpizza.jpg',
-        rating: 4.7,
-        location: 'Cheraga',
-        pricing: '\$\$\$',
-        categories: ['Fast Food', 'Vegetarian'],
-        dietaryOptions: ['All', 'Vegetarian', 'Vegan'],
-        specialFeatures: ['All', 'Family friendly', 'Take out'],
-        menuItems: [
-          {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
-          {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
-        ],
-        openingHours: {
-          'Sunday': '9:00 AM - 10:00 PM',
-          'Monday': '9:00 AM - 10:00 PM',
-          'Tuesday': '9:00 AM - 10:00 PM',
-        },
-    );
-  }
-}
 
 Widget buildRestaurantView({
+  required int restaurateurID,
   required BuildContext context,
   required String restaurantName,
   required String description,
@@ -351,271 +396,117 @@ Widget buildRestaurantView({
   required Map<String, String> openingHours,
 
 }) {
-    return Scaffold(
-      backgroundColor: whiteColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: AppBar(
-          backgroundColor: whiteColor, 
-          elevation: 0,
-          leading: Container(
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: blackColor),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          title: Text(
-            'Restaurant View',
-            style: headlineStyle.copyWith(
-              fontFamily: 'Sen', 
-            ),
-          ),
-          actions: [
-            Container(
-              margin: smallPadding,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: lightGrayColor,
-              ),
-            ),
-          ],
+  return Scaffold(
+    backgroundColor: whiteColor,
+    appBar: PreferredSize(
+      preferredSize: const Size.fromHeight(60.0),
+      child: AppBar(
+        backgroundColor: whiteColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: blackColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Restaurant View',
+          style: headlineStyle.copyWith(fontFamily: 'Sen'),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: horizontalPadding.copyWith(top: 16.0),
-              child: Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24.0),
-                  child: Image.asset(
-                    imagePath,
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+    ),
+    body: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: horizontalPadding.copyWith(top: 16.0),
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24.0),
+                child: Image.asset(
+                  imagePath,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(height: 16.0),
-            Padding(
-              padding: horizontalPadding,
-              child: Text(
-                restaurantName,
-                style: headlineStyle.copyWith(
-                  fontSize: 24.0,
+          ),
+          const SizedBox(height: 16.0),
+          Padding(
+            padding: horizontalPadding,
+            child: Text(
+              restaurantName,
+              style: headlineStyle.copyWith(fontSize: 24.0),
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Padding(
+            padding: horizontalPadding,
+            child: Text(
+              description,
+              style: bodyTextStyle.copyWith(fontSize: 14.0, color: darkGrayColor),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Padding(
+            padding: horizontalPadding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.star, color: darkOrangeColor, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      rating.toString(),
+                      style: headlineStyle.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            Padding(
-              padding: horizontalPadding,
-              child: Text(
-                description,
-                style: bodyTextStyle.copyWith(
-                  fontSize: 14.0,
-                  color: darkGrayColor,
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: darkOrangeColor, size: 20),
+                    const SizedBox(width: 4),
+                    Text(location, style: bodyTextStyle.copyWith(color: darkGrayColor)),
+                  ],
                 ),
-              ),
+                Row(
+                  children: [
+                    Text(pricing, style: bodyTextStyle.copyWith(color: darkOrangeColor)),
+                    const SizedBox(width: 4),
+                    Text('Pricing', style: bodyTextStyle.copyWith(color: darkGrayColor)),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 16.0),
-            
-            Padding(
-              padding: horizontalPadding,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  
-                  bool isSmallScreen = constraints.maxWidth < 400;
-
-                  return isSmallScreen
-                      ? Column( 
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          
-                          Row(children: [
-                            const Icon(Icons.star, color: darkOrangeColor, size: 20),
-                            const SizedBox(width: 4),
-                            Text(
-                            '$rating',
-                            style: headlineStyle.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          ],),
-                          
-                          ElevatedButton(
-                            style: primaryButtonStyle,
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Added to Favorites!'),
-                                  ),
-                                );
-                              },
-                              child: const Icon(Icons.favorite),
-                        
-                          
-                          ),
-                  
-                        ],
-                      ),
-                      const SizedBox(height: 8), 
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, color: darkOrangeColor, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            location,
-                            style: bodyTextStyle.copyWith(
-                              color: darkGrayColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            '\$\$\$',
-                            style: bodyTextStyle.copyWith(
-                              color: darkOrangeColor,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Pricing',
-                            style: bodyTextStyle.copyWith(
-                              color: darkGrayColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                      : Row( 
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.star, color: darkOrangeColor, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$rating',
-                            style: headlineStyle.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, color: darkOrangeColor, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            location,
-                            style: bodyTextStyle.copyWith(
-                              color: darkGrayColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            pricing,
-                            style: bodyTextStyle.copyWith(
-                              color: darkOrangeColor,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Pricing',
-                            style: bodyTextStyle.copyWith(
-                              color: darkGrayColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 16.0),
-            Padding(
-              padding: horizontalPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Category',
-                    style: subheadingStyle.copyWith(color: Colors.black),
-                  ),
-                  const SizedBox(height: 8.0),
-                  const Wrap(
-                    spacing: 10.0,
-                    runSpacing: 8.0,
-                    children: [
-                      CategoryChip(label: 'Fast Food'),
-                      CategoryChip(label: 'Vegetarian'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          ),
           const SizedBox(height: 16.0),
           _buildChipsSection('Category', categories),
           const SizedBox(height: 16.0),
           _buildChipsSection('DIETARY', dietaryOptions),
           const SizedBox(height: 16.0),
           _buildChipsSection('SPECIAL FEATURES', specialFeatures),
-            const SizedBox(height: 16.0),
-            Padding(
-              padding: horizontalPadding,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Menu',
-                    style: subheadingStyle.copyWith(
-                      fontWeight: FontWeight.bold, color:Colors.black,
-                    ),
+          const SizedBox(height: 16.0),
+          Padding(
+            padding: horizontalPadding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Menu', style: subheadingStyle.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
+                GestureDetector(
+
+                  child: Row(
+                    children: [
+                      Text('See All', style: bodyTextStyle.copyWith(color: darkOrangeColor)),
+                      const Icon(Icons.arrow_forward, color: darkOrangeColor, size: 16.0),
+                    ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                     
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuUserView(), 
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          'See All',
-                          style: bodyTextStyle.copyWith(
-                            color: darkOrangeColor, 
-                          ),
-                        ),
-                        const Icon(Icons.arrow_forward, color: darkOrangeColor, size: 16.0),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16.0),
-            SingleChildScrollView(
+          ),
+          const SizedBox(height: 16.0),
+          SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: menuItems.map((item) {
@@ -630,12 +521,12 @@ Widget buildRestaurantView({
               }).toList(),
             ),
           ),
-            const SizedBox(height: 16.0),
-            Padding(
+          const SizedBox(height: 16.0),
+          Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.download, color: Colors.white),
-              label: const Text(
+              icon: Icon(Icons.download, color: Colors.white),
+              label: Text(
                 'Download Menu',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
@@ -651,17 +542,17 @@ Widget buildRestaurantView({
           const SizedBox(height: 16.0),
           Padding(
             padding: horizontalPadding,
-            child: ReviewCard(rating: rating.toString(), totalReviews: 20),
+            child: ReviewCard(rating: rating.toString(), totalReviews: 20, restaurateurID: restaurateurID,),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: OpeningHoursCard(openingHours: openingHours),
           ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
 Widget _buildChipsSection(String title, List<String> chips) {
   return Padding(
@@ -680,5 +571,6 @@ Widget _buildChipsSection(String title, List<String> chips) {
     ),
   );
 }
+
 
 

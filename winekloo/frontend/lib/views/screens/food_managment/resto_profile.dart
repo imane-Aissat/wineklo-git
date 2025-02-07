@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
-import '../../../bloc/restaurateur_cubit.dart'; // Adjust the path accordingly
-import '../../../models/restaurateur.dart'; // Adjust the path accordingly
+import '../../../bloc/restaurateur_cubit.dart'; 
+import '../../../models/restaurateur.dart'; 
 
 class RestaurantViewPage extends StatelessWidget {
   const RestaurantViewPage({super.key});
