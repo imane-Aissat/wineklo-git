@@ -10,8 +10,8 @@ import '/views/screens/homescreen/settingsPage.dart';
 import '../../../bloc/foodie_cubit.dart';
 
 class ProfilePage extends StatelessWidget {
+  
   const ProfilePage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -120,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const FavoritesPage()),
+                                  builder: (context) => FavoritesPage(foodieID: foodieProfile.foodieID ?? 0)),
                             );
                           },
                           child: Text(

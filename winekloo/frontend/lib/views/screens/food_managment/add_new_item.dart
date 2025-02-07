@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:userworkside/models/menu_model.dart';
+import '../../../bloc/menu_cubit.dart';
 
 import 'package:flutter/material.dart';
 import '/views/screens/food_managment/my_food_list.dart';
@@ -21,15 +24,12 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
   final TextEditingController detailsController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
   String? selectedCategory; 
-
-   final List<String> categories = [ 
+  File? _selectedImage; 
+  final ImagePicker _picker = ImagePicker();
+  final List<String> categories = [ 
     "Favorites", "Specials", "Appetizers", "Main Course", "Desserts", "Drinks", "Vegetarian", "Kids' Menu",
   ];
  
-
-
-  File? _selectedImage; 
-  final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -45,6 +45,7 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: whiteColor,
         title: const Text("Add New Item",
         style:blackHeadlineStyle ,
         ),
@@ -80,7 +81,8 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
               "Reset",
               style: TextStyle(
                 color: darkOrangeColor, 
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w600,
+              
               ),
             ),
           ),
@@ -118,9 +120,9 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
                 ),
                 const SizedBox(height: 10),
                      GestureDetector(
-  onTap: () {
+                 onTap:  _pickImage,
     
-  },
+  
   child: Container(
     width: 120,
     height: 120,
@@ -134,7 +136,7 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
         children: [
           Icon(
             Icons.cloud_upload_outlined,
-            color: Colors.orange, 
+            color: darkOrangeColor, 
             size: 40,
           ),
           SizedBox(height: 8),
@@ -216,20 +218,32 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
                 
                 Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: ()  async {
                   if (_formKey.currentState!.validate()) {
                     
-                    final newItem = FoodItem(
+                    final newItem = Menu(
+                     
                       name: nameController.text,
-                      price: priceController.text,
+                      price: int.tryParse(priceController.text) ?? 0,  // Converts to double, defaults to 0.0 if invalid
                       details: detailsController.text,
                       category: selectedCategory!,
-                    );
-                    Navigator.pop(context, newItem);
+                      picture: _selectedImage?.path,
+                      restaurateurID: 2, 
+
+                    ); 
+               
+
+        // Navigate back to the previous screen if needed
+// Return the new item to the previous screen
+    Navigator.pop(context, newItem);
+    // Show confirmation
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Item added successfully')),
+        );
                   }
                 },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange, 
+                    backgroundColor:darkOrangeColor, 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),

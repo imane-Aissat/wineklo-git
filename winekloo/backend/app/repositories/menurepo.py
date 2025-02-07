@@ -35,3 +35,6 @@ class MenuRepository:
         db.session.delete(menu)
         db.session.commit()
         return True
+    @staticmethod
+    def get_menu_by_restaurateur(restaurateur_id):
+        return Menu.query.filter_by(RestaurateurID=restaurateur_id).all()

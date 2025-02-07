@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/bloc/restaurateurs_cubit.dart';
 import 'package:userworkside/themes/styles/colors.dart';
 import 'package:userworkside/themes/styles/styles.dart';
 import '/views/screens/homescreen/restau%20profile.dart';
-
+import '/bloc/restaurateurs_cubit.dart';
+import '/models/restaurateur.dart';
 
 class FavoritesPage extends StatefulWidget {
-  const FavoritesPage({super.key});
+  final int foodieID; 
+
+  const FavoritesPage({super.key, required this.foodieID});
 
   @override
   State<FavoritesPage> createState() => _FavoritesPageState();
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<RestaurateursCubit>().loadAllFavorites(widget.foodieID);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -20,7 +31,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Favorites', style: blackSubHeadlineStyle.copyWith(fontSize: screenWidth * 0.05,)),
+        title: Text(
+          'Favorites',
+          style: blackSubHeadlineStyle.copyWith(fontSize: screenWidth * 0.05),
+        ),
         backgroundColor: whiteColor,
       ),
       body: Padding(
@@ -28,81 +42,40 @@ class _FavoritesPageState extends State<FavoritesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
-            /*Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.05),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: screenWidth * 0.08,
-                    ),
-                  ),
-                  Text(
-                    "Favorites",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.05,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.1),
-                ],
-              ),
-            ), */
             SizedBox(height: screenHeight * 0.03),
-
-            
             Expanded(
-  child: GridView.builder(
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: screenWidth > 600 ? 3 : 2,
-      crossAxisSpacing: screenWidth * 0.04,
-      mainAxisSpacing: screenHeight * 0.03,
-      childAspectRatio: screenWidth > 600 ? 0.8 : 0.75,
-    ),
-    itemCount: 3,
-    itemBuilder: (context, index) {
-      final restaurants = [
-        {
-          "image": "assets/images/hichamcookpizza.jpg",
-          "name": "Hicham Cook Pizza",
-          "location": "Cheraga",
-          "rating": "3.5"
-        },
-        {
-          "image": "assets/images/hichamcookgrill.jpg",
-          "name": "Hicham Cook Grill",
-          "location": "Ouled Fayet",
-          "rating": "3.8"
-        },
-        {
-          "image": "assets/images/citeasiatique.jpg",
-          "name": "La Cité Asiatique",
-          "location": "Val d'Hydra",
-          "rating": "4.1"
-        },
-       
-      ];
+              child: BlocBuilder<RestaurateursCubit, List<Restaurateur>?>(
+                builder: (context, restaurateurs) {
+                  if (restaurateurs == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (restaurateurs.isEmpty) {
+                    return const Center(child: Text("No favorite restaurants yet."));
+                  }
 
-      
-      final restaurant = restaurants[index % restaurants.length];
-
-      return restaurantCardFav(
-        restaurant["image"]!,
-        restaurant["name"]!,
-        restaurant["location"]!,
-        restaurant["rating"]!,
-        context,
-      );
-    },
-  ),
-),
-
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: screenWidth > 600 ? 3 : 2,
+                      crossAxisSpacing: screenWidth * 0.04,
+                      mainAxisSpacing: screenHeight * 0.03,
+                      childAspectRatio: screenWidth > 600 ? 0.8 : 0.75,
+                    ),
+                    itemCount: restaurateurs.length,
+                    itemBuilder: (context, index) {
+                      final restaurant = restaurateurs[index];
+                      return restaurantCardFav(
+                        restaurant.photo ?? "assets/images/defaultprofilepic.jpg",
+                        restaurant.name ?? "Unnamed restau",
+                        restaurant.location ?? "Unnamed Location",
+                        restaurant.ratingValueAverage.toString(),
+                        context,
+                        restaurant.restaurateurID ?? 0,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -110,16 +83,15 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 }
 
-
-Widget restaurantCardFav(String picture, String restauName, String location, String rating, BuildContext context) {
+Widget restaurantCardFav(
+    String picture, String restauName, String location, String rating, BuildContext context, int restauID) {
   final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
 
   return InkWell(
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) =>  const RestaurantViewPage())
+        MaterialPageRoute(builder: (context) => RestaurantViewPage(restaurateurID: restauID,)),
       );
     },
     child: Container(
@@ -127,9 +99,9 @@ Widget restaurantCardFav(String picture, String restauName, String location, Str
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.shade200,
+            color: Colors.grey.shade300,
             blurRadius: screenWidth * 0.02,
-            offset: Offset(0, screenWidth * 0.002),
+            offset: Offset(0, screenWidth * 0.005),
           ),
         ],
         color: Colors.white,
@@ -137,57 +109,47 @@ Widget restaurantCardFav(String picture, String restauName, String location, Str
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           ClipRRect(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(screenWidth * 0.03),
             ),
-            child: AspectRatio(
-              aspectRatio: 3 / 2,
-              child: Image.asset(
-                picture,
-                fit: BoxFit.cover,
-              ),
+            child: Image.network(
+              picture,
+              height: screenWidth * 0.35,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset("assets/images/placeholder.jpg",
+                    height: screenWidth * 0.35, width: double.infinity, fit: BoxFit.cover);
+              },
             ),
           ),
-
           Padding(
             padding: EdgeInsets.all(screenWidth * 0.03),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  restauName,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.04,
-                
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(restauName, style: blackBodyTextStyle, maxLines: 2, overflow: TextOverflow.ellipsis),
                 SizedBox(height: screenWidth * 0.01),
-                Text(
-                  location,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: screenWidth * 0.02),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      rating,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        location,
+                        style: grayBodyTextStyle.copyWith(fontSize: screenWidth * 0.035, color: Colors.grey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(
-                      Icons.star_rate,
-                      color: Colors.orange,
-                      size: screenWidth * 0.05,
+                    Row(
+                      children: [
+                        Text(
+                          rating,
+                          style: blackHeadlineStyle.copyWith(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
+                        ),
+                        Icon(Icons.star, color: Colors.orange, size: screenWidth * 0.05),
+                      ],
                     ),
                   ],
                 ),

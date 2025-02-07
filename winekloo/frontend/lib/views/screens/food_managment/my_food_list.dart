@@ -1,209 +1,227 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/views/screens/food_managment/edit_menu_item.dart';
 import '/views/screens/food_managment/add_new_item.dart';
 import '/views/themes/styles/colors.dart';
-import '/views/themes/styles/styles.dart'; 
+import '/views/themes/styles/styles.dart';
+import '../../../bloc/menu_cubit.dart';
+import 'dart:io';
+import '/models/menu_model.dart';
 
-class FoodItem {
-  final String name;
-  final String details;
-  final String price;
-  final String category; 
 
-  FoodItem({
-    required this.name,
-    required this.details,
-    required this.price,
-    required this.category, 
-  });
-}
 
-class FoodMenuPage extends StatefulWidget {
+class FoodMenuPage extends StatelessWidget {
   const FoodMenuPage({super.key});
 
   @override
-  State<FoodMenuPage> createState() => _FoodMenuPageState();
-}
-
-
-class _FoodMenuPageState extends State<FoodMenuPage> {
-  List<FoodItem> foodItems = [
-    FoodItem(
-      name: "Pizza",
-      details: "tomato base, cheese and olives",
-      price: "600",
-      category:"Main Course"
-    ),
-    FoodItem(
-      name: "Chicken pasta",
-      details: "Chicken, cheese",
-      price: "1400",
-      category:"Main Course"
-    ),
-    FoodItem(
-      name: "Caesar salad",
-      details: "Lettuce, tomatoes, bread and chicken",
-      price: "750",
-      category:"Appetizers"
-    ),
-  ];
-
-  void addFoodItem(FoodItem newItem) {
-    setState(() {
-      foodItems.add(newItem);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 7, 
-      child: Scaffold(
-        backgroundColor: whiteColor, 
-        appBar: AppBar(
-          backgroundColor: whiteColor,
-          elevation: 0,
-          leading: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              margin: const EdgeInsets.all(8.0),
-              decoration: const BoxDecoration(
-                color: lightGrayColor, 
-                shape: BoxShape.circle,
+    return BlocProvider.value(
+      value: context.read<MenuCubit>()..fetchMenusByRestaurantId(2),
+      child: DefaultTabController(
+        length: 7,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.black),
               ),
-              child: const Icon(Icons.arrow_back, color: blackColor),
+            ),
+            title: const Text(
+              "My Food List",
+              style: TextStyle(color: Colors.black, fontSize: 24),
+            ),
+            centerTitle: true,
+            bottom: const TabBar(
+              isScrollable: true,
+              labelColor: darkOrangeColor,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: darkOrangeColor,
+              labelStyle: TextStyle(fontSize: 18, color: darkOrangeColor),
+              tabs: [
+                Tab(text: "All"),
+                Tab(text: "Favorites"),
+                Tab(text: "Specials"),
+                Tab(text: "Appetizers"),
+                Tab(text: "Main Course"),
+                Tab(text: "Desserts"),
+                Tab(text: "Drinks"),
+              ],
             ),
           ),
-          title: const Text(
-            "My Food List",
-            style: blackHeadlineStyle, 
+          body: TabBarView(
+            children: [
+              _buildFoodList(),
+              _buildFoodList(category: "Favorites"),
+              _buildFoodList(category: "Specials"),
+              _buildFoodList(category: "Appetizers"),
+              _buildFoodList(category: "Main Course"),
+              _buildFoodList(category: "Desserts"),
+              _buildFoodList(category: "Drinks"),
+            ],
           ),
-          centerTitle: true,
-         bottom: const TabBar(
-  isScrollable: true,
-  labelColor: darkOrangeColor,
-  unselectedLabelColor: darkGrayColor,
-  indicatorColor: darkOrangeColor,
-  labelStyle: orangeSubheadingStyle,
-  tabs: [
-    Tab(text: "All"),
-    Tab(text: "Favorites"),
-    Tab(text: "Specials"),
-    Tab(text: "Appetizers"),
-    Tab(text: "Main Course"),
-    Tab(text: "Desserts"),
-    Tab(text: "Drinks"),
-    Tab(text: "Vegetarian"),
-    Tab(text: "Kids’ Menu"),
-  ],
-),
-
-        ),
-       body: TabBarView(
-  children: [
-    _buildFoodList(), 
-    _buildFoodList(category: "Favorites"), 
-    _buildFoodList(category: "Specials"), 
-    _buildFoodList(category: "Appetizers"), 
-    _buildFoodList(category: "Main Course"), 
-    _buildFoodList(category: "Desserts"), 
-    _buildFoodList(category: "Drinks"), 
-    _buildFoodList(category: "Vegetarian"), 
-    _buildFoodList(category: "Kids' Menu"), 
-  ],
-),
-
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final newItem = await Navigator.push<FoodItem>(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddNewItemsPage(),
-              ),
-            );
-
-            
-            if (newItem != null) {
-              addFoodItem(newItem);
-            }
-          },
-          backgroundColor: whiteColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.0),
-            side: const BorderSide(color: darkOrangeColor, width: 2.0),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              try {
+                final newItem = await Navigator.push<Menu>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddNewItemsPage(),
+                  ),
+                );
+                if (newItem != null) {
+                  context.read<MenuCubit>().createMenu(newItem);
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error: $e'),
+                  ),
+                );
+              }
+            },
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(100.0),
+              side: const BorderSide(color: darkOrangeColor, width: 2.0),
+            ),
+            child: const Icon(Icons.add, color: darkOrangeColor),
           ),
-          child: const Icon(Icons.add, color: darkOrangeColor), 
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
 
- Widget _buildFoodList({String? category}) {
-  final filteredItems = category == null
-      ? foodItems 
-      : foodItems.where((item) => item.category == category).toList();
+Widget _buildFoodList({String? category}) {
+  return BlocBuilder<MenuCubit, List<Menu>>(
+    builder: (context, menus) {
+      if (menus == null || menus.isEmpty) {
+    return const Center(child: CircularProgressIndicator());
+  }else {
+         // Ensure category names are trimmed and compared correctly
+      final filteredItems = category != null
+          ? menus.where((item) => item.category?.trim().toLowerCase() == category.trim().toLowerCase()).toList()
+          : menus;
 
-  return SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Text(
-            "Total ${filteredItems.length} items", 
-            style: placeholderTextStyle,
-          ),
+        if (filteredItems.isEmpty) {
+          return const Center(child: Text("No items found"));
+        }
+
+        return ListView.builder(
+            itemCount: filteredItems.length,
+            itemBuilder: (context, index) {
+              final item = filteredItems[index];
+
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Card(
+                  color: Colors.white,
+                  
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(12.0),
+                     leading: item.picture != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              File(item.picture!),
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ): Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.circular(8.0),
         ),
-       
-       
-        ListView.builder(
-          itemCount: filteredItems.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            final item = filteredItems[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Card(
-                color: whiteColor,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(12.0),
-                  leading: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: lightGrayColor,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      
+        child: const Icon(Icons.image, color: Colors.grey),
+      ),
+title: Text(item.name ?? "Unknown Name"),  // <-- Safe default
+subtitle: Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(item.details ?? "No details available"),  // <-- Safe default
+    const SizedBox(height: 4),
+    Text("${item.price ?? "0"} DZD", style: TextStyle(color: darkOrangeColor)),
+  ],
+),
+                    trailing: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                      onSelected: (value) async {
+                        
+                        final foodCubit = context.read<MenuCubit>();
+                        if (value == 'Edit') {
+                          final editedItem = await Navigator.push<Menu>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EditItemPage(existingItem: item),
+                            ),
+                          );
+                          if (editedItem != null) {
+                            try {
+                              await foodCubit.updateMenu(editedItem);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Item updated successfully')),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Error updating item')),
+                              );
+                            }
+                          }
+                        } else if (value == 'Delete') {
+                          try {
+                            await foodCubit.deleteMenu(item.menuID!);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Item deleted successfully')),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error deleting item: $e')),
+                            );
+                          }
+                        }
+                        }
+                    ,
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'Edit',
+                          child: Text('Edit'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'Delete',
+                          child: Text('Delete'),
+                        ),
+                      ],
                     ),
-                  title: Text(item.name, style: blackBodyTextStyle),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item.details, style: grayBodyTextStyle),
-                      const SizedBox(height: 4),
-                       Row(
-                        children: [
-                          Text(" ${item.price}  DZD", style: orangeBodyTextStyle),
-                        ],
-                      ),
-                    ],
-                  ),
-                  trailing: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.more_vert, color: darkGrayColor),
-                    ],
-                  ),
+
+                    ),
+                 
                 ),
-              ),
-            );
-          },
-        )
-      ],
-    ),
+              );
+            },
+          );
+        
+      }
+    },
   );
 }
 

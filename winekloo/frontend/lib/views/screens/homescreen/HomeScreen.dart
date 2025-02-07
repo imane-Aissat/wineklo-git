@@ -15,48 +15,45 @@ class homeScreen extends StatefulWidget {
 }
 
 class _homeScreenState extends State<homeScreen> {
+  int? _selectedCategoryId;
+
+  final Map<int, String> categoryMap = {
+    1: "Italian",
+    2: "Indian",
+    3: "FastFood",
+    4: "Traditional",
+    5: "Asian",
+    6: "Seafood",
+    7: "Healthy",
+    8: "Mexican",
+    9: "Vegetarian",
+  };
+
   @override
   void initState() {
     super.initState();
-    final foodieCubit = context.read<FoodieCubit>();
-    foodieCubit.loadProfile(1);
-
-    final restaurateursCubit = context.read<RestaurateursCubit>();
-    restaurateursCubit.loadAllRestaurateurs(); 
+    context.read<FoodieCubit>().loadProfile(1);
+    context.read<RestaurateursCubit>().loadAllRestaurateurs();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return BlocProvider(
-      create: (context) => RestaurateursCubit()..loadAllRestaurateurs(),
-      child:  Scaffold(
+    return Scaffold(
       backgroundColor: whiteColor,
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(padding: EdgeInsets.only(top: screenHeight * 0.05)),
-            Container(
-              margin: const EdgeInsets.all(0),
-              padding: const EdgeInsets.only(top: 20, left: 20, bottom: 0),
-              child: const Text("Good morning,", style: grayBodyTextStyle),
+            const Padding(
+              padding: EdgeInsets.only(top: 40, left: 20),
+              child: Text("Good morning,", style: grayBodyTextStyle),
             ),
             BlocBuilder<FoodieCubit, Foodie?>(
               builder: (context, foodieProfile) {
-                if (foodieProfile == null) {
-                  return const CircularProgressIndicator();
-                }
-                return Container(
-                  margin: const EdgeInsets.all(0),
+                return Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    foodieProfile.fullname ?? "Unnamed User",
+                    foodieProfile?.fullname ?? "Unnamed User",
                     style: blackHeadlineStyle,
                   ),
                 );
@@ -78,7 +75,6 @@ class _homeScreenState extends State<homeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 5.0),
             const Padding(
               padding: EdgeInsets.only(left: 20),
               child: Text("Categories", style: blackHeadlineStyle),
@@ -86,168 +82,126 @@ class _homeScreenState extends State<homeScreen> {
             const SizedBox(height: 10.0),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(children: [
-                cuisineCard("Italian", "assets/images/italianfood.jpg"),
-                cuisineCard("Indian", "assets/images/indianfood.jpg"),
-                cuisineCard("Mexican", "assets/images/mexicanfood.jpg"),
-                cuisineCard("Traditional", "assets/images/traditional.jpg"),
-                cuisineCard("Asian", "assets/images/asian.jpg"),
-                cuisineCard("Sea food", "assets/images/seafood.jpg"),
-                cuisineCard("Healthy", "assets/images/healthyfood.jpg"),
-                cuisineCard("Fast food", "assets/images/fastfood.jpg"),
-                cuisineCard("Vegetarian", "assets/images/vegetarian.jpg"),
-              ]),
+              child: Row(
+                children: [
+                  cuisineCard("All", null),
+                  ...categoryMap.entries.map((entry) => cuisineCard(entry.value, entry.key)),
+                ],
+              ),
             ),
             const SizedBox(height: 25.0),
             const Padding(
               padding: EdgeInsets.only(left: 20),
               child: Text("Popular", style: blackHeadlineStyle),
             ),
-            const SizedBox(height: 10.0),
             BlocBuilder<RestaurateursCubit, List<Restaurateur>?>(
               builder: (context, restaurateursList) {
                 if (restaurateursList == null || restaurateursList.isEmpty) {
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: restaurateursList.map((restau) {
+                List<Restaurateur> filteredList = _selectedCategoryId == null
+                    ? restaurateursList
+                    : restaurateursList.where((restau) => restau.categories == _selectedCategoryId).toList();
+
+                if (filteredList.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text("Oh! Oh! We will be adding restaurants soon!!"),
+                  );
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.9,
+                    ),
+                    itemCount: filteredList.length,
+                    itemBuilder: (context, index) {
+                      final restau = filteredList[index];
                       return restaurantCard(
-                        restau.photo ?? "no photo", 
-                        restau.name ?? "no name", 
-                        restau.location ?? "no location", 
-                        restau.ratingValueAverage.toString(), 
-                        context
+                        restau.photo ?? "no photo",
+                        restau.name ?? "no name",
+                        restau.location ?? "no location",
+                        restau.ratingValueAverage.toString(),
+                        context,
+                        restau.restaurateurID ?? 0,
                       );
-                    }).toList(),
+                    },
                   ),
                 );
               },
             ),
-            const SizedBox(height: 25.0),
-            const Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Text("Asian", style: blackHeadlineStyle),
-            ),
-            const SizedBox(height: 10.0),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(children: [
-                restaurantCard("assets/images/citeasiatique.jpg", "la cité Asiatique", "Val d'Hydra", "4.1", context),
-                restaurantCard("assets/images/sushiball.png", "sushi ball", "Dely brahim", "3.8", context),
-                restaurantCard("assets/images/citeasiatique.jpg", "DreamRoll", "Ain Allah", "3.5", context),
-              ]),
-            ),
-          ],
-        ),
-      ),
-    ));
-  }
-
-  Widget cuisineCard(String cuisineName, String picture) {
-    return Container(
-      margin: const EdgeInsets.only(left: 8, top: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: darkGrayColor),
-        borderRadius: BorderRadius.circular(40.0),
-        color: whiteColor,
-        boxShadow: const [
-          BoxShadow(
-            blurStyle: BlurStyle.outer,
-            spreadRadius: 0,
-            blurRadius: 2,
-            color: darkGrayColor,
-          ),
-        ],
-      ),
-      width: 160,
-      height: 55,
-      child: InkWell(
-        onTap: () {},
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: CircleAvatar(
-                radius: 24,
-                backgroundImage: AssetImage(picture),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(cuisineName, style: blackBodyTextStyle),
           ],
         ),
       ),
     );
   }
 
-  Widget restaurantCard(String picture, String restauName, String location, String rating, context) {
+  Widget cuisineCard(String cuisineName, int? categoryId) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedCategoryId = categoryId;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(left: 8, top: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: _selectedCategoryId == categoryId ? darkOrangeColor : darkGrayColor),
+          borderRadius: BorderRadius.circular(40.0),
+          color: whiteColor,
+        ),
+        child: Text(cuisineName, style: blackBodyTextStyle),
+      ),
+    );
+  }
+
+  Widget restaurantCard(String picture, String restauName, String location, String rating, context, int restauID) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const RestaurantViewPage())
+          MaterialPageRoute(
+            builder: (context) => RestaurantViewPage(restaurateurID: restauID),
+          ),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.only(left: 10),
-        height: 215,
-        width: 230,
-        child: Material(
-          color: whiteColor,
-          shadowColor: darkGrayColor,
-          borderRadius: BorderRadius.circular(10),
-          elevation: 4.0,
-          child: Column(
-            children: [
-              Container(
-                height: 150,
-                width: 230,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: lightGrayColor,
-                    width: 1,         
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8.5), 
-                  child: Image.asset(
-                    picture,
-                    fit: BoxFit.fill,
-                  ),
-                ),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 3,
+        child: Column(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(picture, fit: BoxFit.cover, width: double.infinity),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(restauName, style: blackBodyTextStyle, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(location, style: grayBodyTextStyle),
+                  Row(
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(restauName, style: blackBodyTextStyle),
-                          Text(location, style: grayBodyTextStyle),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(rating),
-                          const Icon(Icons.star_rate, color: darkOrangeColor),
-                        ],
-                      ),
+                      Icon(Icons.star_rate, color: darkOrangeColor, size: 16),
+                      Text(rating),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

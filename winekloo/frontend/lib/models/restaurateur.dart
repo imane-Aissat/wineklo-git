@@ -7,8 +7,8 @@ class Restaurateur {
   final String? password;
   final String? location;
   final String? photo;
-  final Map<String, dynamic>? workingHours; // JSONB field
-  final List<String>? workingDays; // Array field
+  final Map<String, dynamic>? workingHours;
+  final List<String>? workingDays; 
   final String? description;
   final String? ratingValueAverage;
   final String? menuFilePDF;
