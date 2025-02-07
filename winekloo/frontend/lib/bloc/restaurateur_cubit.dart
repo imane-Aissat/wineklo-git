@@ -7,6 +7,8 @@ class RestaurateurCubit extends Cubit<Restaurateur?> {
   RestaurateurCubit() : super(null);
 
   static const String baseUrl = "http://127.0.0.1:5000"; 
+
+  // Load a Restaurateur by ID
   Future<void> loadRestaurateur(int restaurateurID) async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/restaurateur/$restaurateurID"));
@@ -23,5 +25,25 @@ class RestaurateurCubit extends Cubit<Restaurateur?> {
       emit(null);
     }
   }
-  
+
+  // Update a Restaurateur
+  Future<void> updateRestaurateur(Restaurateur updatedRestaurateur) async {
+    try {
+      final response = await http.put(
+        Uri.parse("$baseUrl/restaurateur/${updatedRestaurateur.restaurateurID}"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(updatedRestaurateur.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final updated = Restaurateur.fromJson(data);
+        emit(updated); 
+      } else {
+        print("Failed to update restaurateur: ${response.body}");
+      }
+    } catch (e) {
+      print("Error updating restaurateur: $e");
+    }
+  }
 }
