@@ -53,3 +53,28 @@ def add_review_route(restaurateur_id):
         "ReviewID": review.ReviewID,
         "Date": review.Date.isoformat()
     }), 201
+
+@reviews_bp.route("/reviews/onerestau/", methods = ['GET'])
+def get_reviews_of_restau():
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        restaurant_id = decoded["Restaurateur_id"]
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+    reviews_with_full_name = ReviewRepository.get_all_reviews(restaurant_id)
+    formatted_reviews = []
+    for review, foodie_name in reviews_with_full_name:
+        formatted_reviews.append(review.to_json(foodie_name))
+    
+    return jsonify(formatted_reviews)
+
+    

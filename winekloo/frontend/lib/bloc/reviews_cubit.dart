@@ -82,4 +82,31 @@ class ReviewsCubit extends Cubit<List<Review>> {
   }
 
 
+  Future<void> loadReviewsRestaurant() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('jwt_token');
+
+  if (token == null) {
+    emit([]);
+    return;
+  }
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/reviews/onerestau/'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    final reviews = data.map((review) => Review.fromJson(review)).toList();
+    emit(reviews);
+  } else {
+    emit([]);
+  }
+}
+
+
 }

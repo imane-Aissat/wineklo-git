@@ -29,7 +29,7 @@ class ReviewsPage extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
-        create: (context) => ReviewsCubit()..loadReviews(2), 
+        create: (context) => ReviewsCubit()..loadReviewsRestaurant(), 
         child: BlocBuilder<ReviewsCubit, List<Review>>(
           builder: (context, reviews) {
             if (reviews.isEmpty) {
