@@ -66,20 +66,27 @@ class ReviewsCubit extends Cubit<List<Review>> {
       }
     }
 
-    Map<int, double> calculateRatingDistribution() {
-    if (state.isEmpty) return {};
-
-    final Map<int, int> ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-
-    for (var review in state) {
-      if (review.rating != null && ratingCounts.containsKey(review.rating)) {
-        ratingCounts[review.rating!] = ratingCounts[review.rating]! + 1;
-      }
-    }
-
-    final totalReviews = state.length;
-    return ratingCounts.map((key, value) => MapEntry(key, (value / totalReviews) * 100));
+   Map<int, double> calculateRatingDistribution() {
+  if (state.isEmpty) {
+    print("No reviews available to calculate rating distribution.");
+    return {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
   }
+
+  final Map<int, int> ratingCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+
+  for (var review in state) {
+    if (review.rating != null && ratingCounts.containsKey(review.rating)) {
+      ratingCounts[review.rating!] = ratingCounts[review.rating]! + 1;
+    }
+  }
+
+  final totalReviews = state.length;
+  final ratingDistribution = ratingCounts.map((key, value) => MapEntry(key, (value / totalReviews) * 100));
+
+  print("Rating Distribution: $ratingDistribution");  // Debugging output
+  return ratingDistribution;
+}
+
 
 
   Future<void> loadReviewsRestaurant() async {

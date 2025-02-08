@@ -18,7 +18,7 @@ class RestaurantDashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReviewsCubit()..loadReviews(2),
+      create: (context) => ReviewsCubit()..loadReviewsRestaurant(),
       child: Scaffold(
         backgroundColor: whiteColor, 
         appBar: AppBar(
@@ -102,22 +102,32 @@ class RestaurantDashboardPage extends StatelessWidget {
                 children: [
                   Text('Average rating: ${averageRating.toStringAsFixed(1)}/5', style: bodyTextStyle),
                   const SizedBox(height: 16.0),
-                  SizedBox(
-                    height: 200,
-                    child: PieChart(
-                      PieChartData(
-                        sections: distribution.entries.map((entry) {
-                          final color = {1: lightGrayColor, 2: Colors.blue, 3: Colors.green, 4: lightOrangeColor, 5: darkOrangeColor}[entry.key];
-                          return PieChartSectionData(
-                            color: color,
-                            value: entry.value,
-                            title: '${entry.value.toStringAsFixed(1)}%',
-                            titleStyle: buttonTextStyle,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
+                 SizedBox(
+  height: 200,
+  child: PieChart(
+    PieChartData(
+      sections: distribution.entries.map((entry) {
+        final colorsMap = {
+          1: lightGrayColor,
+          2: Colors.blue,
+          3: Colors.green,
+          4: lightOrangeColor,
+          5: darkOrangeColor
+        };
+
+        final color = colorsMap[entry.key] ?? Colors.black; // Ensure no null color
+
+        return PieChartSectionData(
+          color: color,
+          value: entry.value > 0 ? entry.value : 0.1, // Ensure it's not zero
+          title: entry.value > 0 ? '${entry.value.toStringAsFixed(1)}%' : '',
+          titleStyle: buttonTextStyle,
+        );
+      }).toList(),
+    ),
+  ),
+),
+
                 ],
               );
             },

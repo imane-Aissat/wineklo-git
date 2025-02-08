@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from app.repositories.menurepo import MenuRepository
 from app.models.menu import Menu
+import jwt
 
+SECRET_KEY = "key"
 menu_bp = Blueprint('menu_bp', __name__)
 
 @menu_bp.route('/menu', methods=['GET'])
@@ -49,5 +51,28 @@ def get_menus_by_restaurant(restaurant_id):
     try:
         menus = MenuRepository.get_menu_by_restaurateur(restaurant_id)
         return jsonify([menu.to_json() for menu in menus]), 200 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@menu_bp.route('/menu/onerestau', methods=['GET'])
+def get_menus_of_restaurant():
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        restaurant_id = decoded["Restaurateur_id"]
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+    try:
+        menus = MenuRepository.get_menu_by_restaurateur(restaurant_id)
+        return jsonify([menu.to_json() for menu in menus]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
