@@ -16,7 +16,7 @@ class FoodMenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: context.read<MenuCubit>()..fetchMenusByRestaurantId(2),
+      value: context.read<MenuCubit>()..fetchMenuByRestaurantId(),
       child: DefaultTabController(
         length: 7,
         child: Scaffold(

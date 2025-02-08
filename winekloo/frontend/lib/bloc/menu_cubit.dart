@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+
 import '../models/menu_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,7 +60,7 @@ class MenuCubit extends Cubit<List<Menu>> {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/menu/restaurant'),
+      Uri.parse('$baseUrl/menu/onerestau'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
