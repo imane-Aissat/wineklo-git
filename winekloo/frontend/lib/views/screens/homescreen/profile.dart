@@ -8,9 +8,14 @@ import '/views/screens/homescreen/editProfile.dart';
 import '/views/screens/homescreen/settingsPage.dart';
 import '../../../bloc/foodie_cubit.dart';
 
-class ProfilePage extends StatelessWidget {
-  
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -134,46 +139,9 @@ class ProfilePage extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.01),
                   const SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child:  Row(
-                      children: [
-                        Text("add here"),   
-                        Text("add here"), 
-                        Text("add here"),                           
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  Padding(
-                    padding: EdgeInsets.only(left: screenWidth * 0.03),
-                    child: const Text(
-                      "Visited",
-                      style: blackSubHeadlineStyle,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        Text("add here"),
-                        Text("add here"),          
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  Padding(
-                    padding: EdgeInsets.only(left: screenWidth * 0.03),
-                    child: const Text(
-                      "Visit Later",
-                      style: blackSubHeadlineStyle,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        Text("add here"),     
+                        
                       ],
                     ),
                   ),

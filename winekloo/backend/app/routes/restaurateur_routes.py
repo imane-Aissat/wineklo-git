@@ -74,3 +74,25 @@ def get_logged_in_restaurateur():
         return jsonify({"error": "Token expired"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 4011
+    
+
+
+@restaurateur_bp.route('/load/favorites/profile', methods = ['GET'])
+def get_all_fav_restau_profile():
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        foodie_id = decoded["Foodie_id"]
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+    favoriteRestaurateurs = get_favorite_restaurateurs(foodie_id)
+    for restaurateur in favoriteRestaurateurs:
+        print(restaurateur.to_json())
+    return jsonify([restaurateur.to_json() for restaurateur in favoriteRestaurateurs]), 200

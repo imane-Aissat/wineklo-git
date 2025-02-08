@@ -103,4 +103,11 @@ class RestaurateurCubit extends Cubit<Restaurateur?> {
       emit(null);
     }
   }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('jwt_token');
+    emit(null);
+  }
+
 }
