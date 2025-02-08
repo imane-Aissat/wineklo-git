@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:userworkside/views/screens/homescreen/privacySettings.dart';
-import 'package:userworkside/views/screens/homescreen/resetPassword.dart';
+import 'package:userworkside/views/screens/homescreen/PrivacySettings.dart';
+import 'package:userworkside/views/screens/homescreen/ResetPassword.dart';
 import '/views/screens/login/loginPage.dart';
 import '/views/screens/signup/foodieSignup.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/homescreen/editProfile.dart';
-import '/views/screens/homescreen/help&Support.dart';
+import 'Help&Support.dart';
 import '../../../bloc/foodie_cubit.dart';
 import 'package:userworkside/models/foodie_model.dart';
 
@@ -64,6 +64,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
+                       backgroundImage: foodieProfile.photo != null &&
+                                      foodieProfile.photo!.isNotEmpty
+                                  ? AssetImage(foodieProfile.photo!)
+                                  : const AssetImage(
+                                          "assets/images/defaultprofilepic.jpg")
+                                      as ImageProvider,
                     radius: screenWidth * 0.08,
                     backgroundColor: lightGrayColor,
                   ),

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:userworkside/views/screens/Homescreen/Search.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
-import '/views/screens/homescreen/restau%20profile.dart';
+import '/views/screens/Homescreen/RestaurantProfile.dart';
 import '../../../bloc/foodie_cubit.dart';
 import '../../../bloc/restaurateurs_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/models/foodie_model.dart';
 import 'package:userworkside/models/restaurateur.dart';
 
-class homeScreen extends StatefulWidget {
-  const homeScreen({super.key});
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
   @override
-  State<homeScreen> createState() => _homeScreenState();
+  State<Homescreen> createState() => _HomescreenState();
 }
 
-class _homeScreenState extends State<homeScreen> {
+class _HomescreenState extends State<Homescreen> {
   int? _selectedCategoryId;
 
   final Map<int, String> categoryMap = {
@@ -62,6 +63,16 @@ class _homeScreenState extends State<homeScreen> {
             Padding(
               padding: const EdgeInsets.all(15),
               child: TextField(
+                onSubmitted: (query) {
+                  if (query.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(initialQuery: query),
+                      ),
+                    );
+                  }
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: lightGrayColor,
@@ -164,46 +175,72 @@ class _homeScreenState extends State<homeScreen> {
     );
   }
 
-  Widget restaurantCard(String picture, String restauName, String location, String rating, context, int restauID) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RestaurantViewPage(restaurateurID: restauID),
-          ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 3,
-        child: Column(
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(picture, fit: BoxFit.cover, width: double.infinity),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(restauName, style: blackBodyTextStyle, maxLines: 2, overflow: TextOverflow.ellipsis),
-                  Text(location, style: grayBodyTextStyle),
-                  Row(
-                    children: [
-                      Icon(Icons.star_rate, color: darkOrangeColor, size: 16),
-                      Text(rating),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+ Widget restaurantCard(
+    String picture, String restauName, String location, String rating, BuildContext context, int restauID) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
+
+  return InkWell(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RestaurantViewPage(restaurateurID: restauID),
         ),
+      );
+    },
+    child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+      elevation: 3,
+      child: Column(
+        children: [
+          // Responsive Image Section
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.03)),
+              child: Image.asset(
+                picture,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+          ),
+          // Responsive Content Section
+          Padding(
+            padding: EdgeInsets.all(screenWidth * 0.03),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  restauName,
+                  style: blackBodyTextStyle.copyWith(fontSize: screenHeight * 0.022, fontWeight: FontWeight.bold),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: screenWidth * 0.01),
+                Text(
+                  location,
+                  style: grayBodyTextStyle.copyWith(fontSize: screenHeight * 0.018, color: Colors.grey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: screenWidth * 0.01),
+                Row(
+                  children: [
+                    Icon(Icons.star_rate, color: darkOrangeColor, size: screenWidth * 0.04),
+                    Text(
+                      rating,
+                      style: blackHeadlineStyle.copyWith(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

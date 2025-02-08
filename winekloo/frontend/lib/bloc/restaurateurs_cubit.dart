@@ -29,6 +29,7 @@ class RestaurateursCubit extends Cubit<List<Restaurateur>?> {
 
   Future<void> loadAllFavorites(int foodieID) async {
     try {
+      emit(null);
       final response = await http.get(Uri.parse("$baseUrl/all/restaurateurs/favorites/$foodieID"));
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);

@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/bloc/restaurateurs_cubit.dart';
 import 'package:userworkside/themes/styles/colors.dart';
 import 'package:userworkside/themes/styles/styles.dart';
-import '/views/screens/homescreen/restau%20profile.dart';
-import '/bloc/restaurateurs_cubit.dart';
+import '/views/screens/homescreen/Restaurantprofile.dart';
 import '/models/restaurateur.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -86,70 +85,60 @@ class _FavoritesPageState extends State<FavoritesPage> {
 Widget restaurantCardFav(
     String picture, String restauName, String location, String rating, BuildContext context, int restauID) {
   final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
   return InkWell(
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => RestaurantViewPage(restaurateurID: restauID,)),
+        MaterialPageRoute(builder: (context) => RestaurantViewPage(restaurateurID: restauID)),
       );
     },
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade300,
-            blurRadius: screenWidth * 0.02,
-            offset: Offset(0, screenWidth * 0.005),
-          ),
-        ],
-        color: Colors.white,
-      ),
+    child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+      elevation: 3,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(screenWidth * 0.03),
-            ),
-            child: Image.network(
-              picture,
-              height: screenWidth * 0.35,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Image.asset("assets/images/placeholder.jpg",
-                    height: screenWidth * 0.35, width: double.infinity, fit: BoxFit.cover);
-              },
+          // Image section with proper height and rounded corners
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.03)),
+              child: Image.network(
+                picture,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(picture, width: double.infinity, fit: BoxFit.cover);
+                },
+              ),
             ),
           ),
+          // Content section
           Padding(
             padding: EdgeInsets.all(screenWidth * 0.03),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(restauName, style: blackBodyTextStyle, maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(
+                  restauName,
+                  style: blackBodyTextStyle.copyWith(fontSize: screenHeight * 0.02, fontWeight: FontWeight.bold),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: screenWidth * 0.01),
+                Text(
+                  location,
+                  style: grayBodyTextStyle.copyWith(fontSize: screenHeight * 0.018, color: Colors.grey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 SizedBox(height: screenWidth * 0.01),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Text(
-                        location,
-                        style: grayBodyTextStyle.copyWith(fontSize: screenWidth * 0.035, color: Colors.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          rating,
-                          style: blackHeadlineStyle.copyWith(fontSize: screenWidth * 0.04, fontWeight: FontWeight.bold),
-                        ),
-                        Icon(Icons.star, color: Colors.orange, size: screenWidth * 0.05),
-                      ],
+                    Icon(Icons.star_rate, color: Colors.orange, size: screenWidth * 0.04),
+                    Text(
+                      rating,
+                      style: blackHeadlineStyle.copyWith(fontSize: screenWidth * 0.035, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/views/screens/homescreen/RestaurantMenu.dart';
 import 'package:userworkside/views/screens/homescreen/reviewsUser.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
-import '/views/screens/food_managment/my_reviews.dart';
+import '../../../bloc/foodie_cubit.dart';
 import '../../../bloc/restaurateur_cubit.dart'; 
 import '../../../models/restaurateur.dart'; 
+import '../../../bloc/categories_cubit.dart';
+import '../../../models/categories_model.dart';
+import '../../../bloc/specialfeatures_cubit.dart';
+import '../../../models/specialfeatures_model.dart';
 
 class RestaurantViewPage extends StatelessWidget {
   final int restaurateurID; 
@@ -22,7 +27,16 @@ class RestaurantViewPage extends StatelessWidget {
             if (restaurateur == null) {
               return const Center(child: CircularProgressIndicator());
             }
-
+            final categoriesCubit = context.read<CategoriesCubit>();
+            categoriesCubit.loadCategoryById(restaurateur.categories ?? 0);
+           
+            final specialfeatures = context.read<SpecialFeaturesCubit>();
+            specialfeatures.loadSpecialFeaturesById(restaurateur.specialFeatures ?? 0);
+    
+            return BlocBuilder<CategoriesCubit, List<Categories>>(
+  builder: (context, categories) {
+    return BlocBuilder<SpecialFeaturesCubit, List<SpecialFeatures>>(
+      builder: (context, specialFeatures) {
             return buildRestaurantView(
               restaurateurID: restaurateur.restaurateurID ?? 0,
               context: context,
@@ -32,15 +46,21 @@ class RestaurantViewPage extends StatelessWidget {
               rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
               location: restaurateur.location ?? 'Unknown location',
               pricing: getPricingSymbol(restaurateur.pricing),
-              categories: getCategoryList(restaurateur.categories),
+              categories: getCategoryList(categories),
+              specialFeatures: getSpecialFeaturesList(specialFeatures),
               dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
-              specialFeatures: getFeatureList(restaurateur.specialFeatures),
+           
               menuItems: [
                 {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
                 {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
               ],
-              openingHours: convertWorkingHours(restaurateur.workingHours),
-            );
+               openingHours: convertWorkingHours(restaurateur.workingHours),
+        );
+      },
+    );
+  },
+);
+
           },
         ),
       ),
@@ -57,18 +77,22 @@ class RestaurantViewPage extends StatelessWidget {
     if (pricing == null) return '\$';
     return '\$' * pricing;
   }
+  
+   List<String> getCategoryList(List<Categories> categories) {
+    return categories.isNotEmpty ? categories.map((c) => c.categoryName ?? 'Unknown').toList() : ['Unknown Category'];
+  }
 
-  List<String> getCategoryList(int? categories) {
-    return categories != null ? ['Category $categories'] : ['Unknown Category'];
+
+
+  List<String> getSpecialFeaturesList(List<SpecialFeatures> specialfeatures) {
+    return specialfeatures.isNotEmpty ? specialfeatures.map((c) => c.feature ?? 'Unknown').toList() : ['Unknown specialfeatures'];
   }
 
   List<String> getDietaryList(int? dietaryPreferences) {
     return dietaryPreferences != null ? ['Dietary $dietaryPreferences'] : ['All'];
   }
 
-  List<String> getFeatureList(int? specialFeatures) {
-    return specialFeatures != null ? ['Feature $specialFeatures'] : ['No special features'];
-  }
+ 
 }
 
 
@@ -268,7 +292,7 @@ class ReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4.0),
                 Text(
-                  rating, // Use the rating parameter
+                  rating, 
                   style: bodyTextStyle.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: screenWidth * 0.04,
@@ -377,9 +401,6 @@ class MenuCard extends StatelessWidget {
 
 
 
-
-
-
 Widget buildRestaurantView({
   required int restaurateurID,
   required BuildContext context,
@@ -394,7 +415,6 @@ Widget buildRestaurantView({
   required List<String> specialFeatures,
   required List<Map<String, String>> menuItems,
   required Map<String, String> openingHours,
-
 }) {
   return Scaffold(
     backgroundColor: whiteColor,
@@ -480,26 +500,28 @@ Widget buildRestaurantView({
               ],
             ),
           ),
+          const SizedBox(height: 16.0),
           Center(
             child: ElevatedButton(
-               onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.white,
-                    ),
-                  );
-                },
+              onPressed: () {
+                context.read<FoodieCubit>().addToFavorites(restaurateurID);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Colors.white,
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: lightOrangeColor,
                 shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2), 
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                ),   
-              child: const Text("Add to favorites", style: buttonTextStyle,),
-            )
+              ),
+              child: const Text("Add to favorites", style: buttonTextStyle),
+            ),
           ),
           const SizedBox(height: 16.0),
           _buildChipsSection('Category', categories),
@@ -515,7 +537,6 @@ Widget buildRestaurantView({
               children: [
                 Text('Menu', style: subheadingStyle.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                 GestureDetector(
-
                   child: Row(
                     children: [
                       Text('See All', style: bodyTextStyle.copyWith(color: darkOrangeColor)),
@@ -527,43 +548,32 @@ Widget buildRestaurantView({
             ),
           ),
           const SizedBox(height: 16.0),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: menuItems.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: MenuCard(
-                    imagePath: item['imagePath']!,
-                    itemName: item['itemName']!,
-                    price: item['price']!,
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 16.0),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.download, color: Colors.white),
-              label: Text(
-                'Download Menu',
+            child: Center(
+              child: ElevatedButton.icon(
+              icon: const  Icon(Icons.arrow_right, color: Colors.white),
+              label: const Text(
+                'Check Our Menu!',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
                 backgroundColor: lightOrangeColor,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 shadowColor: darkOrangeColor,
                 elevation: 4.0,
-              ), onPressed: () {  },
+              ), onPressed: () {
+                Navigator.push(
+                  context , MaterialPageRoute(builder: (context)=> MenuRestaurant(restaurateurID: restaurateurID)));
+              },
+            ),
             ),
           ),
           const SizedBox(height: 16.0),
           Padding(
             padding: horizontalPadding,
-            child: ReviewCard(rating: rating.toString(), totalReviews: 20, restaurateurID: restaurateurID,),
+            child: ReviewCard(rating: rating.toString(), totalReviews: 20, restaurateurID: restaurateurID),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -574,6 +584,8 @@ Widget buildRestaurantView({
     ),
   );
 }
+
+
 
 Widget _buildChipsSection(String title, List<String> chips) {
   return Padding(

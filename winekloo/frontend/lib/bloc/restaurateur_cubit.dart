@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/restaurateur.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RestaurateurCubit extends Cubit<Restaurateur?> {
   RestaurateurCubit() : super(null);
@@ -74,6 +75,32 @@ class RestaurateurCubit extends Cubit<Restaurateur?> {
       }
     } catch (e) {
       print("Error updating restaurateur: $e");
+    }
+  }
+
+  Future<void> loadProfileRestau() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
+
+    if (token == null) {
+      emit(null);
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/restaurateur/logged'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final foodie = Restaurateur.fromJson(data);
+      emit(foodie);
+    } else {
+      emit(null);
     }
   }
 }

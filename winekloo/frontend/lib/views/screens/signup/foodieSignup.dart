@@ -57,13 +57,11 @@ class _FoodieSignupPageState extends State<FoodieSignupPage> {
         child: BlocConsumer<FoodieSignupCubit, SignupState>(
           listener: (context, state) {
             if (state is SignupSuccess) {
-                print("Signup Success!");
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => UserNavBar()), // Navigate on success
+                MaterialPageRoute(builder: (context) => UserNavBar()),
               );
             } else if (state is SignupFailure) {
-              print("Signup Failure: ${state.errorMessage}");
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(state.errorMessage)),
               );
