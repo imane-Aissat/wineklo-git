@@ -6,9 +6,8 @@ import '../models/categories_model.dart';
 class CategoriesCubit extends Cubit<List<Categories>> {
   CategoriesCubit() : super([]);
 
-  static const String baseUrl = "http://127.0.0.1:5000"; // Adjust to your actual backend URL
+  static const String baseUrl = "http://127.0.0.1:5000"; 
 
-  // Load all categories (already implemented)
   Future<void> loadCategories() async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/categories"));
@@ -26,7 +25,7 @@ class CategoriesCubit extends Cubit<List<Categories>> {
     }
   }
 
-  // New: Load category by ID
+ 
   Future<void> loadCategoryById(int categoryId) async {
     if (categoryId == 0) {
       emit([]);

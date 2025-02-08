@@ -28,10 +28,10 @@ class RestaurantViewPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
-            // Load categories by restaurateur.categories ID
+            
             final categoriesCubit = context.read<CategoriesCubit>();
             categoriesCubit.loadCategoryById(restaurateur.categories ?? 0);
-            // Load categories by restaurateur.specialfeatures ID
+           
             final specialfeatures = context.read<SpecialFeaturesCubit>();
             specialfeatures.loadSpecialFeaturesById(restaurateur.specialFeatures ?? 0);
     
@@ -468,8 +468,8 @@ Widget buildRestaurantView({
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
-              icon: Icon(Icons.download, color: Colors.white),
-              label: Text(
+              icon: const  Icon(Icons.download, color: Colors.white),
+              label: const Text(
                 'See Menu',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),

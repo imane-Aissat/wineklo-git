@@ -7,7 +7,7 @@ import 'package:userworkside/models/restaurateur.dart';
 import '/views/screens/homescreen/Restaurantprofile.dart';
 
 class SearchPage extends StatefulWidget {
-  final String? initialQuery; // Accept initial query
+  final String? initialQuery; 
 
   const SearchPage({super.key, this.initialQuery});
 
@@ -18,7 +18,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   String _searchQuery = "";
   List<Restaurateur>? _filteredRestaurants;
-  final TextEditingController _searchController = TextEditingController(); // Controller for TextField
+  final TextEditingController _searchController = TextEditingController(); 
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _SearchPageState extends State<SearchPage> {
 
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _searchQuery = widget.initialQuery!;
-      _searchController.text = _searchQuery; // Set initial text in TextField
+      _searchController.text = _searchQuery; 
       final restaurateursList = context.read<RestaurateursCubit>().state;
       if (restaurateursList != null) {
         _updateSearchResults(_searchQuery, restaurateursList);
@@ -58,7 +58,7 @@ class _SearchPageState extends State<SearchPage> {
           Padding(
             padding: const EdgeInsets.all(15),
             child: TextField(
-              controller: _searchController, // Assign controller
+              controller: _searchController,
               onChanged: (query) {
                 final restaurateursList = context.read<RestaurateursCubit>().state;
                 if (restaurateursList != null) {
@@ -153,7 +153,7 @@ class _SearchPageState extends State<SearchPage> {
                   Text(location, style: grayBodyTextStyle),
                   Row(
                     children: [
-                      Icon(Icons.star_rate, color: darkOrangeColor, size: 16),
+                      const Icon(Icons.star_rate, color: darkOrangeColor, size: 16),
                       Text(rating),
                     ],
                   ),

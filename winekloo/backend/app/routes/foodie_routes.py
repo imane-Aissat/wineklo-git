@@ -113,7 +113,6 @@ def signup_foodie():
         foodie_data = request.get_json()
         print(f"Foodie Data: {foodie_data}")
 
-        # Extract data from the request
         full_name = foodie_data.get("full_name")
         email = foodie_data.get("email")
         phone = foodie_data.get("phone")
@@ -124,11 +123,9 @@ def signup_foodie():
         dietary_options = foodie_data.get("dietaryOptions")
         pricing = foodie_data.get("pricing")
 
-        # Check if the foodie already exists
         if FoodieRepository.get_foodie_by_email(email):
             return jsonify({"error": "Foodie with this email already exists"}), 400
 
-        # Hash the password before storing it
         hashed_password = generate_password_hash(password)
         
         foodie_data = {
@@ -145,10 +142,6 @@ def signup_foodie():
 
         foodie = FoodieRepository.add_foodie(foodie_data)
 
-        print(f"Foodie Data: {foodie_data}")
-        print(f"Pricing found: {pricing}")
-
-        # Save the foodie ID in the session after successful registration
         session['Foodie_id'] = foodie.FoodieID
 
         return jsonify({"message": "Foodie created successfully", "foodie": foodie.to_json()}), 201

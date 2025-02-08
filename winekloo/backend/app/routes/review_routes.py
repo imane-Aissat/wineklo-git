@@ -35,12 +35,8 @@ def add_review_route(restaurateur_id):
         return jsonify({"error": "Invalid token"}), 401
 
     data = request.json
-    print(f"Received Data: {data}")  # Debugging line
-
     comment = data.get("Comment")
     rating = data.get("Rating")
-
-    print(f"Extracted Comment: {comment}, Rating: {rating}")  # Debugging line
 
     if not rating:
         return jsonify({"error": "Rating is required"}), 400
