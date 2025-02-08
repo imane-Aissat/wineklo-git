@@ -233,13 +233,10 @@ class _AddNewItemsPageState extends State<AddNewItemsPage> {
                     ); 
                
 
-        // Navigate back to the previous screen if needed
+        
 // Return the new item to the previous screen
     Navigator.pop(context, newItem);
-    // Show confirmation
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Item added successfully')),
-        );
+    
                   }
                 },
                   style: ElevatedButton.styleFrom(
