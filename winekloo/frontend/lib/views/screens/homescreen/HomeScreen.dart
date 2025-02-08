@@ -32,7 +32,7 @@ class _homeScreenState extends State<homeScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<FoodieCubit>().loadProfile(1);
+    context.read<FoodieCubit>().loadProfile();
     context.read<RestaurateursCubit>().loadAllRestaurateurs();
   }
 

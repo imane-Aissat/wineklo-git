@@ -480,6 +480,27 @@ Widget buildRestaurantView({
               ],
             ),
           ),
+          Center(
+            child: ElevatedButton(
+               onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.white,
+                    ),
+                  );
+                },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: lightOrangeColor,
+                shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2), 
+                ),
+                ),   
+              child: const Text("Add to favorites", style: buttonTextStyle,),
+            )
+          ),
           const SizedBox(height: 16.0),
           _buildChipsSection('Category', categories),
           const SizedBox(height: 16.0),

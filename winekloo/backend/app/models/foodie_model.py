@@ -68,3 +68,21 @@ class Foodie(db.Model):
             'full_name': self.full_name,
             'verified': self.verified
         }
+
+
+    def to_dict(self):
+        return {
+            'FoodieID': self.FoodieID,
+            'Email': self.Email,
+            'PhoneNumber': self.PhoneNumber,
+            'Password': self.Password,
+            'Birthday': self.Birthday.isoformat() if self.Birthday else None,
+            'Gender': self.Gender,
+            'Wilaya': self.Wilaya,
+            'Photo': self.Photo,
+            'FoodieCategories': self.FoodieCategories,
+            'FoodiePreferences': self.FoodiePreferences,
+            'FoodiePricing': self.FoodiePricing,
+            'full_name': self.full_name,
+            'verified': self.verified
+        }

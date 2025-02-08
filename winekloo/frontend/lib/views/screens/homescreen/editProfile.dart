@@ -29,7 +29,7 @@ class _EditProfileState extends State<EditProfile> {
 
     
     Future.microtask(() {
-      context.read<FoodieCubit>().loadProfile(1);
+      context.read<FoodieCubit>().loadProfile();
     });
   }
 

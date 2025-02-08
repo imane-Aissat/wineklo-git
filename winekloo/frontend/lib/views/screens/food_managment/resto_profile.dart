@@ -48,7 +48,7 @@ class RestaurantViewPage extends StatelessWidget {
           location: restaurateur.location ?? 'Unknown location',
           pricing: getPricingSymbol(restaurateur.pricing),
           categories: getCategoryList(categories),
-          specialFeatures: getSpecialFeaturesList(specialFeatures), // Now using the correct state
+          specialFeatures: getSpecialFeaturesList(specialFeatures),
           dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
           menuItems: [
             {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},

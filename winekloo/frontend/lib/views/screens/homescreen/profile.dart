@@ -18,7 +18,7 @@ class ProfilePage extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return BlocProvider(
-      create: (context) => FoodieCubit()..loadProfile(1),
+      create: (context) => FoodieCubit()..loadProfile(),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,

@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
      return BlocProvider(
-      create: (context) => FoodieCubit()..loadProfile(1),
+      create: (context) => FoodieCubit()..loadProfile(),
       child: Scaffold(
       backgroundColor: whiteColor,
       appBar: AppBar(
@@ -136,7 +136,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       ElevatedButton(
                         onPressed: ()  {
-                           context.read<FoodieCubit>().deleteProfile(1);
+                           context.read<FoodieCubit>().deleteProfile();
                            Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context)=> const FoodieSignupPage())
