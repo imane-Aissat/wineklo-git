@@ -17,7 +17,7 @@ class RestaurantViewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => RestaurateurCubit()..loadRestaurateur(9)),
+        BlocProvider(create: (context) => RestaurateurCubit()..loadProfileRestau()),
         BlocProvider(create: (context) => CategoriesCubit()),
         BlocProvider(create: (context) => SpecialFeaturesCubit()),
       ],

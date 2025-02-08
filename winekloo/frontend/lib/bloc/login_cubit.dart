@@ -86,7 +86,6 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
 
-      // If not found in Foodie, check in Restaurateur table
       final restaurateurResponse = await http.post(
         Uri.parse("$baseUrl/restaurateur/login"),
         headers: {"Content-Type": "application/json",
@@ -96,7 +95,11 @@ class LoginCubit extends Cubit<LoginState> {
 
       if (restaurateurResponse.statusCode == 200) {
         final data = jsonDecode(restaurateurResponse.body);
+        final token = data["token"];
         final restaurateur = Restaurateur.fromJson(data);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('jwt_token', token);
         emit(state.copyWith(isLoading: false, isLoggedIn: true, role: 'restaurateur', userID: restaurateur.restaurateurID));
         return;
       }
@@ -128,6 +131,8 @@ class LoginCubit extends Cubit<LoginState> {
         emit(state.copyWith(isLoggedIn: false));
       }
     }
+
+    
 
     Future<void> logout() async {
       final prefs = await SharedPreferences.getInstance();

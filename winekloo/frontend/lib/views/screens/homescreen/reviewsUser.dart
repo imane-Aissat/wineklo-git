@@ -85,24 +85,8 @@ class _UserReviewPageState extends State<UserReviewPage> {
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            review.foodieName ?? "Anonymous",
+                                            review.foodieName ?? "You",
                                             style: blackSubHeadlineStyle,
-                                          ),
-                                          PopupMenuButton<String>(
-                                            onSelected: (value) {
-                                              
-                                            },
-                                            itemBuilder: (context) => [
-                                              const PopupMenuItem(
-                                                value: 'edit',
-                                                child: Text('Edit'),
-                                              ),
-                                              const PopupMenuItem(
-                                                value: 'delete',
-                                                child: Text('Delete'),
-                                              ),
-                                            ],
-                                            icon: const Icon(Icons.more_vert, color: darkGrayColor),
                                           ),
                                         ],
                                       ),
@@ -119,7 +103,7 @@ class _UserReviewPageState extends State<UserReviewPage> {
                                         }),
                                       ),
                                       const SizedBox(height: 4.0),
-                                      Text(review.comment ?? "No comment", style: bodyTextStyle),
+                                      Text(review.comment ?? commentController.text, style: bodyTextStyle),
                                       const SizedBox(height: 8.0),
                                       Align(
                                         alignment: Alignment.bottomRight,

@@ -31,15 +31,13 @@ class _EditItemPageState extends State<EditItemPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the controllers with the existing item's data
     nameController = TextEditingController(text: widget.existingItem.name);
-priceController = TextEditingController(
-  text: widget.existingItem.price?.toString() ?? '',
-);
+    priceController = TextEditingController(
+    text: widget.existingItem.price?.toString() ?? '',
+      );
     detailsController = TextEditingController(text: widget.existingItem.details);
     selectedCategory = widget.existingItem.category;
-    _selectedImage = widget.existingItem.picture != null ? File(widget.existingItem.picture!) : null;
-     
+    _selectedImage = widget.existingItem.picture != null ? File(widget.existingItem.picture!) : null;  
   }
 
   Future<void> _pickImage() async {
@@ -155,14 +153,13 @@ priceController = TextEditingController(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                        if (_formKey.currentState!.validate()) {
-    widget.existingItem.name = nameController.text;
-widget.existingItem.price = int.tryParse(priceController.text);
-    widget.existingItem.details = detailsController.text;
-    widget.existingItem.category = selectedCategory!;
-    widget.existingItem.picture = _selectedImage?.path; 
-    Navigator.pop(context, widget.existingItem);
-  }
-
+                            widget.existingItem.name = nameController.text;
+                            widget.existingItem.price = int.tryParse(priceController.text);
+                            widget.existingItem.details = detailsController.text;
+                            widget.existingItem.category = selectedCategory!;
+                            widget.existingItem.picture = _selectedImage?.path; 
+                            Navigator.pop(context, widget.existingItem);
+                          }
                       }
                     },
                     style: ElevatedButton.styleFrom(
