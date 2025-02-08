@@ -480,6 +480,28 @@ Widget buildRestaurantView({
               ],
             ),
           ),
+          const SizedBox(height: 10),
+          Center(
+            child: ElevatedButton(
+               onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.white,
+                    ),
+                  );
+                },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: lightOrangeColor,
+                shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2), 
+                ),
+                ),   
+              child: const Text("Add to favorites", style: buttonTextStyle,),
+            )
+          ),
           const SizedBox(height: 16.0),
           _buildChipsSection('Category', categories),
           const SizedBox(height: 16.0),
@@ -525,8 +547,8 @@ Widget buildRestaurantView({
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
-              icon: Icon(Icons.download, color: Colors.white),
-              label: Text(
+              icon: const Icon(Icons.download, color: Colors.white),
+              label: const Text(
                 'Download Menu',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
