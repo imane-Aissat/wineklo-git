@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import '../models/pricing_model.dart'; // Adjust the import path
+import '../models/pricing_model.dart'; 
 
 class PricingCubit extends Cubit<List<Pricing>> {
   PricingCubit() : super([]);
 
-  static const String baseUrl = "http://127.0.0.1:5000"; // Replace with your backend URL
+  static const String baseUrl = "http://127.0.0.1:5000"; 
 
   Future<void> loadPricings() async {
     try {

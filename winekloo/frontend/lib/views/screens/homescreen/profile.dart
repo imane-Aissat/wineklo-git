@@ -142,7 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         shadowColor: darkOrangeColor,
                         elevation: 4.0,
                         ),
-                        child: const Text("Check out all your favorites" , style: whiteSubheadingStyle),),
+                        child: const Text("Check out all your favorites from here!!" , style: whiteSubheadingStyle),),
                     ),
                   
                   SizedBox(height: screenHeight * 0.03),

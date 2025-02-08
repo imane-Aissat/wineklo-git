@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import '../models/specialfeatures_model.dart'; // Adjust the import path
+import '../models/specialfeatures_model.dart'; 
 
 class SpecialFeaturesCubit extends Cubit<List<SpecialFeatures>> {
   SpecialFeaturesCubit() : super([]);
 
-  static const String baseUrl = "http://127.0.0.1:5000"; // Replace with your backend URL
+  static const String baseUrl = "http://127.0.0.1:5000"; 
 
   Future<void> loadSpecialFeatures() async {
     try {
