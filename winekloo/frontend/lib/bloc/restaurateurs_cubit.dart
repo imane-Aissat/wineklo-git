@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import '../models/restaurateur.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RestaurateursCubit extends Cubit<List<Restaurateur>?> {
   RestaurateursCubit() : super(null);
@@ -46,4 +47,35 @@ class RestaurateursCubit extends Cubit<List<Restaurateur>?> {
       emit([]);
     }
   }
+
+
+  Future<void> loadFavoritesProfile() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('jwt_token');
+
+  if (token == null) {
+    emit([]);
+    return;
+  }
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/load/favorites/profile'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonData = jsonDecode(response.body); 
+    final List<Restaurateur> restaurateurs = jsonData.map((json) => Restaurateur.fromJson(json)).toList();
+
+    emit(restaurateurs); 
+  } else {
+    emit([]);
+  }
+}
+
+
+
 }

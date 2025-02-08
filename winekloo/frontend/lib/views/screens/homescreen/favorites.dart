@@ -99,7 +99,6 @@ Widget restaurantCardFav(
       elevation: 3,
       child: Column(
         children: [
-          // Image section with proper height and rounded corners
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.03)),

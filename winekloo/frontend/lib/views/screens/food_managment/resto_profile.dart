@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/views/screens/food_managment/edit_resto_profile.dart';
+import 'package:userworkside/views/screens/login/loginPage.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
@@ -311,18 +313,6 @@ class ReviewCard extends StatelessWidget {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 Widget buildRestaurantView({
   required BuildContext context,
   required String restaurantName,
@@ -355,19 +345,29 @@ Widget buildRestaurantView({
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_horiz, color: blackColor),
-            color: Colors.grey[200],
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'Edit Profile',
-                child: Text('Edit Profile', style: TextStyle(fontFamily: 'Noyh', color: Colors.black)),
-              ),
-              const PopupMenuItem(
-                value: 'Log Out',
-                child: Text('Log Out', style: TextStyle(fontFamily: 'Noyh', color: Colors.black)),
-              ),
-            ],
-          ),
+  icon: const Icon(Icons.more_horiz, color: blackColor),
+  color: Colors.grey[200],
+  onSelected: (value) {
+    if (value == 'Log Out') {
+      context.read<RestaurateurCubit>().logout();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage())
+      );
+    } else if (value == 'Edit Profile') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const RestaurantEditPage()));
+    }
+  },
+  itemBuilder: (context) => [
+    const PopupMenuItem(
+      value: 'Edit Profile',
+      child: Text('Edit Profile', style: TextStyle(fontFamily: 'Noyh', color: Colors.black)),
+    ),
+    const PopupMenuItem(
+      value: 'Log Out',
+      child: Text('Log Out', style: TextStyle(fontFamily: 'Noyh', color: Colors.black)),
+    ),
+  ],
+)
+
         ],
       ),
     ),
