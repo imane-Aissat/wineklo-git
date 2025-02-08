@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/foodie_model.dart';
 import 'package:intl/intl.dart';
-
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SignupState {
   final int currentStep;
@@ -89,8 +91,9 @@ class SignupState {
 }
 
 class SignupInitial extends SignupState {
-  SignupInitial({super.currentStep = 0})
+  SignupInitial({int currentStep = 0})
       : super(
+          currentStep: currentStep,
           obscurePassword: true,
           obscureConfirmPassword: true,
           agreeToTerms: false,
@@ -111,8 +114,9 @@ class SignupInitial extends SignupState {
         );
 }
 class SignupStepChanged extends SignupState {
-  SignupStepChanged({required super.currentStep})
+  SignupStepChanged({required int currentStep})
       : super(
+          currentStep: currentStep,
           obscurePassword: true,
           obscureConfirmPassword: true,
           agreeToTerms: false,
@@ -155,7 +159,6 @@ class SignupSuccess extends SignupState {
           verificationCodeController: TextEditingController(),
         );
 }
-
 class SignupFailure extends SignupState {
   final String errorMessage;
 
@@ -181,16 +184,38 @@ class SignupFailure extends SignupState {
           verificationCodeController: TextEditingController(),
         );
 }
-
+class SignupLoading extends SignupState {
+  SignupLoading()
+      : super(
+          currentStep: 0,
+          obscurePassword: true,
+          obscureConfirmPassword: true,
+          agreeToTerms: false,
+          selectedGender: null,
+          selectedWilaya: null,
+          selectedCategories: [],
+          selectedDietaryOptions: [],
+          selectedPricing: [],
+          otherCategory: '',
+          otherDietary: '',
+          fullNameController: TextEditingController(),
+          emailController: TextEditingController(),
+          phoneController: TextEditingController(),
+          passwordController: TextEditingController(),
+          confirmPasswordController: TextEditingController(),
+          dateOfBirthController: TextEditingController(),
+          verificationCodeController: TextEditingController(),
+        );
+}
 
 class FoodieSignupCubit extends Cubit<SignupState> {
-  final FoodieRepository foodieRepository;
+  FoodieSignupCubit() : super(SignupInitial());
 
-  FoodieSignupCubit({required this.foodieRepository}) : super(SignupInitial());
+  static const String baseUrl = "http://127.0.0.1:5000";  
 
   void nextStep() {
     final currentStep = state.currentStep;
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       emit(state.copyWith(currentStep: currentStep + 1));
       print("Moved to next step: ${currentStep + 1}");
     }
@@ -274,13 +299,19 @@ class FoodieSignupCubit extends Cubit<SignupState> {
     emit(state.copyWith(selectedPricing: []));
   }
 
-  void signup({
+  String hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final hash = sha256.convert(bytes);
+    return hash.toString();
+  }
+
+  // Function to handle sign-up via HTTP
+  Future<void> signup({
     required String fullName,
     required String email,
     required String phone,
     required String password,
     required String confirmPassword,
-    required String dateOfBirth,
     required String gender,
     required String wilaya,
     required List<String> categories,
@@ -288,36 +319,59 @@ class FoodieSignupCubit extends Cubit<SignupState> {
     required List<String> pricing, 
   }) async {
     try {
+      emit(SignupLoading());
 
-        final dateFormat = DateFormat('M/d/yyyy');
-    final DateTime parsedDateOfBirth = dateFormat.parse(dateOfBirth);
+      // Check if foodie exists via HTTP request
+      final existsResponse = await http.get(Uri.parse('$baseUrl/foodie/check/$email'));
+      if (existsResponse.statusCode == 200 && existsResponse.body == 'true') {
+        throw Exception('An account with this email already exists');
+      }
+
+      // Validate fields
       if (email.isEmpty || password.isEmpty) {
         throw Exception('Email or password cannot be empty');
       }
-
       if (password != confirmPassword) {
         throw Exception('Passwords do not match');
       }
 
-      final foodie = Foodie(
-        foodieID: null,
-        email: email,
-        password: password,
-        phoneNumber: phone,
-        birthday: parsedDateOfBirth,  
-        gender: gender,
-        wilaya: wilaya,
-        foodieCategories: categories.length, 
-        foodiePreferences: dietaryOptions.length, 
-        foodiePricing: pricing.length,
-        fullname: fullName,
+
+
+      // Prepare the foodie data
+      final foodie = {
+        "full_name ": fullName,
+        "email": email,
+        "phone": phone,
+        "password": hashPassword(password),
+        "gender": gender,
+        "wilaya": wilaya,
+        "categories": categories,
+        "dietaryOptions": dietaryOptions,
+        "pricing": pricing
+      };
+
+      // Send the sign-up request
+      final signUpResponse = await http.post(
+        Uri.parse('$baseUrl/foodie/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(foodie),
       );
 
-      await foodieRepository.createFoodie(foodie);
+      if (signUpResponse.statusCode == 201) {
+        emit(SignupSuccess());
+      } else {
+        print('Response body: ${signUpResponse.body}');
+        print('Foodie data: $foodie');
 
-      emit(SignupSuccess());
+        throw Exception('Failed to create foodie');
+      }
     } catch (error) {
       emit(SignupFailure(error.toString()));
     }
   }
 }
+
+
+
+
+

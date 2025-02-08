@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/repositories/restaurateur_repo.dart';
 import '../models/restaurateur_model.dart';
 
 class SignupState {
@@ -122,9 +123,9 @@ final Map<String, Map<String, String>> workingHours;
       otherCategory: otherCategory ?? this.otherCategory,
       otherDietary: otherDietary ?? this.otherDietary,
       updateOtherSpecialFeature: updateOtherSpecialFeature ?? this.updateOtherSpecialFeature,
-      businessNameController: businessNameController ?? businessNameController,
-      emailController: emailController ?? emailController,
-      phoneController: phoneController ?? phoneController,
+      businessNameController: businessNameController ?? this.businessNameController,
+      emailController: emailController ?? this.emailController,
+      phoneController: phoneController ?? this.phoneController,
       passwordController: passwordController ?? this.passwordController,
       confirmPasswordController: confirmPasswordController ?? this.confirmPasswordController,
       verificationCodeController: verificationCodeController ?? this.verificationCodeController,
@@ -136,8 +137,9 @@ final Map<String, Map<String, String>> workingHours;
 }
 
 class SignupInitial extends SignupState {
-  SignupInitial({super.currentStep = 0})
+  SignupInitial({int currentStep = 0})
       : super(
+          currentStep: currentStep,
           obscurePassword: true,
           obscureConfirmPassword: true,
           agreeToTerms: false,
@@ -188,8 +190,9 @@ class SignupInitial extends SignupState {
 }
 
 class SignupStepChanged extends SignupState {
-  SignupStepChanged({required super.currentStep})
+  SignupStepChanged({required int currentStep})
       : super(
+          currentStep: currentStep,
           obscurePassword: true,
           obscureConfirmPassword: true,
           agreeToTerms: false,
@@ -263,7 +266,8 @@ class SignupSuccess extends SignupState {
   'Sunday': {'opening': '', 'closing': ''},
 },
 
-          selectedWorkingDays: [],
+                      selectedWorkingDays: [],
+
           selectedCategories: [],
           selectedDietaryOptions: [],
           selectedSpecialFeatures: [],
@@ -288,7 +292,7 @@ class SignupSuccess extends SignupState {
   'Sunday': {'opening': TextEditingController(), 'closing': TextEditingController()},
 },
           descriptionController: TextEditingController(),
-          ratingValueAverage: 0.0,
+                    ratingValueAverage: 0.0,
           menuFilePDF: '',
         );
 }
@@ -398,7 +402,7 @@ class RestaurateurSignupCubit extends Cubit<SignupState> {
     emit(state.copyWith(phone: value));
   }
 
-    void toggleCategory(String category) {
+  void toggleCategory(String category) {
     final updatedCategories = List<String>.from(state.selectedCategories);
     if (updatedCategories.contains(category)) {
       updatedCategories.remove(category);
@@ -466,17 +470,17 @@ class RestaurateurSignupCubit extends Cubit<SignupState> {
     emit(state.copyWith(selectedPricing: []));
   }
 
-void onWorkingDaysChanged(List<String> workingDays) {
-  emit(state.copyWith(selectedWorkingDays: workingDays));
-  
-}
-void onRatingChanged(double rating) {
-  emit(state.copyWith(ratingValueAverage: rating));
-}
+  void onWorkingDaysChanged(List<String> workingDays) {
+    emit(state.copyWith(selectedWorkingDays: workingDays));
+    
+  }
+  void onRatingChanged(double rating) {
+    emit(state.copyWith(ratingValueAverage: rating));
+  }
 
-void onMenuFileSelected(String filePath) {
-  emit(state.copyWith(menuFilePDF: filePath));
-}
+  void onMenuFileSelected(String filePath) {
+    emit(state.copyWith(menuFilePDF: filePath));
+  }
   void toggleWorkingDay(String day) {
     final updatedWorkingDays = List<String>.from(state.selectedWorkingDays as Iterable);
     if (updatedWorkingDays.contains(day)) {
@@ -492,9 +496,9 @@ void onMenuFileSelected(String filePath) {
     updatedWorkingHours[day] = {'opening': openingTime, 'closing': closingTime};
     emit(state.copyWith(workingHours: updatedWorkingHours));
   }
-void updateRestaurantDescription(String value) {
-  emit(state.copyWith(description: value));
-}
+  void updateRestaurantDescription(String value) {
+    emit(state.copyWith(description: value));
+  }
 
   void signup({
     required String diningType,
@@ -514,13 +518,9 @@ void updateRestaurantDescription(String value) {
     required List<String> dietaryOptions,
     required List<String> specialFeatures,
     required List<String> pricing,
-    
-    
-
+  
   }) async {
     try {
-
-
       final restaurant = Restaurateur(
         restaurateurID: null,
         diningType: diningType,
@@ -539,9 +539,7 @@ void updateRestaurantDescription(String value) {
         restaurateurPreferences: dietaryOptions.length, 
         restaurateurSpecialFeatures: specialFeatures.length,
         restaurateurPricing: pricing.length,
-
       );
-
       await restaurateurRepository.createRestaurateur(restaurant);
 
       emit(SignupSuccess());

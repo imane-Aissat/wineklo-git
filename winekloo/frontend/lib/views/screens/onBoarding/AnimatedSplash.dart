@@ -18,7 +18,6 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Screen size for responsiveness
     final screenWidth = MediaQuery.of(context).size.width;
     final logoSize = screenWidth * 0.5;
 

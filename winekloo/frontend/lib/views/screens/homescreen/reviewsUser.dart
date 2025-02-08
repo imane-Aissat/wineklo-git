@@ -170,7 +170,6 @@ class _UserReviewPageState extends State<UserReviewPage> {
                       onPressed: () {
                         if (commentController.text.isNotEmpty && selectedRating > 0) {
                           context.read<ReviewsCubit>().addReview(
-                            foodieID: 1, 
                             restaurateurID: widget.restaurateurID,
                             comment: commentController.text,
                             rating: selectedRating,

@@ -21,7 +21,7 @@ class _UserNavBarState extends State<UserNavBar> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FoodieCubit()..loadProfile(1), 
+      create: (context) => FoodieCubit()..loadProfile(), 
       child: BlocBuilder<FoodieCubit, Foodie?>(
         builder: (context, foodieProfile) {
           if (foodieProfile == null) {

@@ -480,7 +480,6 @@ Widget buildRestaurantView({
               ],
             ),
           ),
-          const SizedBox(height: 10),
           Center(
             child: ElevatedButton(
                onPressed: () {
@@ -547,8 +546,8 @@ Widget buildRestaurantView({
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
-              icon: const Icon(Icons.download, color: Colors.white),
-              label: const Text(
+              icon: Icon(Icons.download, color: Colors.white),
+              label: Text(
                 'Download Menu',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),

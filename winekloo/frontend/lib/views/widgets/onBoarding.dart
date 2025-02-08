@@ -24,14 +24,12 @@ class OnboardingWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        // Title
         Text(
           item.title,
           style: blackHeadlineStyle.copyWith(color: blackColor),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 15),
-        // Subtitle with consistent margin
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Text(
