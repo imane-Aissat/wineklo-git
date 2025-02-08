@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/models/foodie_model.dart';
-import 'package:userworkside/views/screens/homescreen/favorites.dart';
+import 'package:userworkside/views/screens/homescreen/Favorites.dart';
 import '/themes/styles/colors.dart';
 import '/themes/styles/styles.dart';
-import '/views/screens/homescreen/HomeScreen.dart';
 import '/views/screens/homescreen/editProfile.dart';
 import '/views/screens/homescreen/settingsPage.dart';
 import '../../../bloc/foodie_cubit.dart';
@@ -133,9 +132,9 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  SingleChildScrollView(
+                  const SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Row(
+                    child:  Row(
                       children: [
                         Text("add here"),   
                         Text("add here"), 
@@ -152,7 +151,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  SingleChildScrollView(
+                  const SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
@@ -170,7 +169,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.01),
-                  SingleChildScrollView(
+                  const SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [

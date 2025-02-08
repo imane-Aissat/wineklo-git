@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session
 from datetime import date
 from app.repositories.foodie_repo import FoodieRepository
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.repositories.favorites_repo import add_to_favorites
 import jwt
 import datetime
 SECRET_KEY = "key"
@@ -165,3 +166,24 @@ def check_foodie_by_email(email):
         return jsonify({"message": "Foodie exists"}), 200
     else:
         return jsonify({"message": "Foodie does not exist"}), 404
+    
+
+@foodie_bp.route("/favorites/<int:restau_id>", methods=["POST"])
+def add_to_favorites_route(restau_id):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        foodie_id = decoded["Foodie_id"]
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+    add_to_favorites(foodie_id, restau_id)
+    
+    return jsonify({"message": "Successfully added to favorites!"}), 201

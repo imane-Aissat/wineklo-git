@@ -19,15 +19,11 @@ def get_restaurateur_by_id(id):
 @restaurateur_bp.route('/all/restaurateurs/', methods = ['GET'])
 def get_all_restaurateurs():
     restaurateurs = RestaurateurRepository.get_all_restaurateurs()
-    for restaurateur in restaurateurs:
-        print(restaurateur.to_json())
     return jsonify([restaurateur.to_json() for restaurateur in restaurateurs]), 200
 
 @restaurateur_bp.route('/all/restaurateurs/favorites/<int:id>', methods = ['GET'])
 def get_all_fav_restau(id):
     favoriteRestaurateurs = get_favorite_restaurateurs(id)
-    for restaurateur in favoriteRestaurateurs:
-        print(restaurateur.to_json())
     return jsonify([restaurateur.to_json() for restaurateur in favoriteRestaurateurs]), 200
 
 @restaurateur_bp.route('/restaurateur/login', methods=['POST', 'OPTIONS'])

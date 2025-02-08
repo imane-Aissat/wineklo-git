@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:userworkside/views/screens/Homescreen/Search.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
-import '/views/screens/homescreen/restau%20profile.dart';
+import '/views/screens/Homescreen/restau%20profile.dart';
 import '../../../bloc/foodie_cubit.dart';
 import '../../../bloc/restaurateurs_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/models/foodie_model.dart';
 import 'package:userworkside/models/restaurateur.dart';
 
-class homeScreen extends StatefulWidget {
-  const homeScreen({super.key});
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
   @override
-  State<homeScreen> createState() => _homeScreenState();
+  State<Homescreen> createState() => _HomescreenState();
 }
 
-class _homeScreenState extends State<homeScreen> {
+class _HomescreenState extends State<Homescreen> {
   int? _selectedCategoryId;
 
   final Map<int, String> categoryMap = {
@@ -62,6 +63,16 @@ class _homeScreenState extends State<homeScreen> {
             Padding(
               padding: const EdgeInsets.all(15),
               child: TextField(
+                onSubmitted: (query) {
+                  if (query.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(initialQuery: query),
+                      ),
+                    );
+                  }
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: lightGrayColor,

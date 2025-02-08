@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:userworkside/bloc/restaurateurs_cubit.dart';
 import 'package:userworkside/themes/styles/colors.dart';
 import 'package:userworkside/themes/styles/styles.dart';
-import '/views/screens/homescreen/restau%20profile.dart';
-import '/bloc/restaurateurs_cubit.dart';
+import '/views/screens/homescreen/Restaurantprofile.dart';
 import '/models/restaurateur.dart';
 
 class FavoritesPage extends StatefulWidget {

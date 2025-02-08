@@ -64,7 +64,13 @@ class MainApp extends StatelessWidget {
         BlocProvider<RoleCubit>(create: (_) => RoleCubit()),
         BlocProvider<FoodieSignupCubit>(create: (_) => FoodieSignupCubit()),
         
-        BlocProvider<FoodieCubit>(create: (_) => FoodieCubit()),
+       BlocProvider<FoodieCubit>(
+      create: (context) {
+        final cubit = FoodieCubit();
+        cubit.loadProfile();  
+        return cubit;
+      },
+    ),
         BlocProvider<RestaurateursCubit>(create: (_) => RestaurateursCubit()),
         BlocProvider<ReviewsCubit>(create: (_) => ReviewsCubit()),
         //BlocProvider<RestaurateurSignupCubit>(create: (_) => RestaurateurSignupCubit(restaurateurRepository: restaurateurRepository)),
@@ -82,7 +88,7 @@ class MainApp extends StatelessWidget {
         '/': (context) => const LoginPage(),
         '/splash': (context) => const AnimatedSplashScreen(),
         '/onboarding': (context) => const OnboardingPage(),  
-        '/home': (context) => const homeScreen(),
+        '/home': (context) => const Homescreen(),
         '/homeRestau': (context) =>  const restoNavBar(),
         '/usernavbar': (context) => const UserNavBar(),
         '/login': (context) => const LoginPage(),

@@ -4,6 +4,7 @@ import 'package:userworkside/views/screens/homescreen/reviewsUser.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
+import '../../../bloc/foodie_cubit.dart';
 import '../../../bloc/restaurateur_cubit.dart'; 
 import '../../../models/restaurateur.dart'; 
 
@@ -377,9 +378,6 @@ class MenuCard extends StatelessWidget {
 
 
 
-
-
-
 Widget buildRestaurantView({
   required int restaurateurID,
   required BuildContext context,
@@ -394,7 +392,6 @@ Widget buildRestaurantView({
   required List<String> specialFeatures,
   required List<Map<String, String>> menuItems,
   required Map<String, String> openingHours,
-
 }) {
   return Scaffold(
     backgroundColor: whiteColor,
@@ -480,26 +477,28 @@ Widget buildRestaurantView({
               ],
             ),
           ),
+          const SizedBox(height: 16.0),
           Center(
             child: ElevatedButton(
-               onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
-                      duration: Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.white,
-                    ),
-                  );
-                },
+              onPressed: () {
+                context.read<FoodieCubit>().addToFavorites(restaurateurID);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Successfully added to favorites!", style: orangeBodyTextStyle),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: Colors.white,
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: lightOrangeColor,
                 shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2), 
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                ),   
-              child: const Text("Add to favorites", style: buttonTextStyle,),
-            )
+              ),
+              child: const Text("Add to favorites", style: buttonTextStyle),
+            ),
           ),
           const SizedBox(height: 16.0),
           _buildChipsSection('Category', categories),
@@ -515,7 +514,6 @@ Widget buildRestaurantView({
               children: [
                 Text('Menu', style: subheadingStyle.copyWith(fontWeight: FontWeight.bold, color: Colors.black)),
                 GestureDetector(
-
                   child: Row(
                     children: [
                       Text('See All', style: bodyTextStyle.copyWith(color: darkOrangeColor)),
@@ -544,26 +542,8 @@ Widget buildRestaurantView({
           ),
           const SizedBox(height: 16.0),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.download, color: Colors.white),
-              label: Text(
-                'Download Menu',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
-                backgroundColor: lightOrangeColor,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                shadowColor: darkOrangeColor,
-                elevation: 4.0,
-              ), onPressed: () {  },
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
             padding: horizontalPadding,
-            child: ReviewCard(rating: rating.toString(), totalReviews: 20, restaurateurID: restaurateurID,),
+            child: ReviewCard(rating: rating.toString(), totalReviews: 20, restaurateurID: restaurateurID),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -574,6 +554,8 @@ Widget buildRestaurantView({
     ),
   );
 }
+
+
 
 Widget _buildChipsSection(String title, List<String> chips) {
   return Padding(
