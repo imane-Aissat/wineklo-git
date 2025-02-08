@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/views/screens/food_managment/edit_menu_item.dart';
+import '/views/screens/food_managment/add_new_item.dart';
+import '/views/themes/styles/colors.dart';
+import '../../../bloc/menu_cubit.dart';
+import 'dart:io';
+import '/models/menu_model.dart';
+
+
+
+class MenuRestaurant extends StatelessWidget {
+  final int restaurateurID;
+  const MenuRestaurant({super.key, required this.restaurateurID});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: context.read<MenuCubit>()..fetchMenusByRestaurantId(restaurateurID),
+      child: DefaultTabController(
+        length: 7,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.black),
+              ),
+            ),
+            title: const Text(
+              "My Food List",
+              style: TextStyle(color: Colors.black, fontSize: 24),
+            ),
+            centerTitle: true,
+            bottom: const TabBar(
+              isScrollable: true,
+              labelColor: darkOrangeColor,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: darkOrangeColor,
+              labelStyle: TextStyle(fontSize: 18, color: darkOrangeColor),
+              tabs: [
+                Tab(text: "All"),
+                Tab(text: "Favorites"),
+                Tab(text: "Specials"),
+                Tab(text: "Appetizers"),
+                Tab(text: "Main Course"),
+                Tab(text: "Desserts"),
+                Tab(text: "Drinks"),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              _buildFoodList(),
+              _buildFoodList(category: "Favorites"),
+              _buildFoodList(category: "Specials"),
+              _buildFoodList(category: "Appetizers"),
+              _buildFoodList(category: "Main Course"),
+              _buildFoodList(category: "Desserts"),
+              _buildFoodList(category: "Drinks"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+Widget _buildFoodList({String? category}) {
+  return BlocBuilder<MenuCubit, List<Menu>>(
+    builder: (context, menus) {
+      if (menus.isEmpty) {
+    return const Center(child: CircularProgressIndicator());
+  }else {
+      final filteredItems = category != null
+          ? menus.where((item) => item.category?.trim().toLowerCase() == category.trim().toLowerCase()).toList()
+          : menus;
+
+        if (filteredItems.isEmpty) {
+          return const Center(child: Text("No items found"));
+        }
+
+        return ListView.builder(
+            itemCount: filteredItems.length,
+            itemBuilder: (context, index) {
+              final item = filteredItems[index];
+
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Card(
+                  color: Colors.white,
+                  
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(12.0),
+                     leading: item.picture != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Image.file(
+                              File(item.picture!),
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                          ): Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: const Icon(Icons.image, color: Colors.grey),
+      ),
+          title: Text(item.name ?? "Unknown Name"),  
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(item.details ?? "No details available"),  
+              const SizedBox(height: 4),
+              Text("${item.price ?? "0"} DZD", style: const TextStyle(color: darkOrangeColor)),
+            ],
+          )
+                    ),
+                 
+                ),
+              );
+            },
+          );
+        
+      }
+    },
+  );
+}
+
+}

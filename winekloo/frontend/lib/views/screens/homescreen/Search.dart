@@ -1,293 +1,166 @@
 import 'package:flutter/material.dart';
-import 'package:userworkside/views/screens/homescreen/restau%20profile.dart';
-import 'package:userworkside/views/themes/styles/styles.dart';
-
 import '/views/themes/styles/colors.dart';
+import '/views/themes/styles/styles.dart';
+import '../../../bloc/restaurateurs_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:userworkside/models/restaurateur.dart';
+import '/views/screens/homescreen/Restaurantprofile.dart';
+
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  final String? initialQuery; 
+
+  const SearchPage({super.key, this.initialQuery});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
-  String selectedCategory = 'Category';
-  String selectedplace = 'Place';
-  String selectedRating = 'Rating';
+  String _searchQuery = "";
+  List<Restaurateur>? _filteredRestaurants;
+  final TextEditingController _searchController = TextEditingController(); 
 
-  final List<String> categories = ['Italian', 'Mexican', 'Traditional', 'Asian'];
-  final List<String> places = ['sidi yahia', 'Zeralda', 'Mahelma', 'Alger Centre'];
-  final List<String> ratings = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'];
+  @override
+  void initState() {
+    super.initState();
+    context.read<RestaurateursCubit>().loadAllRestaurateurs();
+
+    if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+      _searchQuery = widget.initialQuery!;
+      _searchController.text = _searchQuery; 
+      final restaurateursList = context.read<RestaurateursCubit>().state;
+      if (restaurateursList != null) {
+        _updateSearchResults(_searchQuery, restaurateursList);
+      }
+    }
+  }
+
+  void _updateSearchResults(String query, List<Restaurateur> restaurateursList) {
+    setState(() {
+      _searchQuery = query;
+      _filteredRestaurants = restaurateursList
+          .where((restau) => restau.name!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
+      backgroundColor: whiteColor,
       appBar: AppBar(
-        centerTitle: true,
-        title: Text('Search', style: blackSubHeadlineStyle.copyWith(fontSize: screenWidth * 0.05,)),
         backgroundColor: whiteColor,
+        elevation: 0,
+        title: const Text("Search Restaurants", style: blackHeadlineStyle),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(screenWidth * 0.1),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-              Padding(
-                padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                child: TextField(
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: lightGrayColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide.none,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (query) {
+                final restaurateursList = context.read<RestaurateursCubit>().state;
+                if (restaurateursList != null) {
+                  _updateSearchResults(query, restaurateursList);
+                }
+              },
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: lightGrayColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: "Lookup a place to test",
+                hintStyle: grayBodyTextStyle,
+                suffixIcon: const Icon(Icons.search, color: darkGrayColor),
+              ),
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<RestaurateursCubit, List<Restaurateur>?>( 
+              builder: (context, restaurateursList) {
+                if (restaurateursList == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final List<Restaurateur> searchResults =
+                    _searchQuery.isEmpty ? restaurateursList : _filteredRestaurants ?? [];
+
+                if (searchResults.isEmpty) {
+                  return const Center(child: Text("No restaurants found!"));
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.9,
                     ),
-                    hintText: 'Search for restaurants',
-                    hintStyle: const TextStyle(fontFamily: 'Sen'),
-                    prefixIcon: const Icon(Icons.search),
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      final restau = searchResults[index];
+                      return restaurantCard(
+                        restau.photo ?? "no photo",
+                        restau.name ?? "no name",
+                        restau.location ?? "no location",
+                        restau.ratingValueAverage.toString(),
+                        context,
+                        restau.restaurateurID ?? 0,
+                      );
+                    },
                   ),
-                ),
-              ),
-              
-              // Filter Row (Clickable)
-              const Text(
-                'Filter By:',
-                style: TextStyle(fontFamily: 'Sen', fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: screenHeight * 0.01),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    FilterButton(
-                      label: selectedCategory,
-                      onTap: () => showCategoryDialog(),
-                    ),
-                    FilterButton(
-                      label: selectedplace,
-                      onTap: () => showplaceDialog(),
-                    ),
-                    FilterButton(
-                      label: selectedRating,
-                      onTap: () => showRatingDialog(),
-                    ),
-                  ],
-                ),
-              ),
-              
-              
-              const SizedBox(height: 20),
-              const Text(
-                'Results',
-                style: TextStyle(fontFamily: 'Sen', fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 1, 
-                itemBuilder: (context, index) {
-                  return RestaurantCard(
-                    image: 'assets/images/sushiball.png', 
-                    name: 'Sushi ball ${index + 1}',
-                    location: 'Dely brahim ${index + 1}',
-                    rating: '3.8',
-                    context: context,
-                  );
-                },
-              ),
-            ],
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-
-  Future<void> showCategoryDialog() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Category'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: categories.map((category) {
-                return ListTile(
-                  title: Text(category),
-                  onTap: () {
-                    setState(() {
-                      selectedCategory = category;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> showplaceDialog() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select place'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: places.map((place) {
-                return ListTile(
-                  title: Text(place),
-                  onTap: () {
-                    setState(() {
-                      selectedplace = place;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  
-  Future<void> showRatingDialog() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Rating'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: ratings.map((rating) {
-                return ListTile(
-                  title: Text(rating),
-                  onTap: () {
-                    setState(() {
-                      selectedRating = rating;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class RestaurantCard extends StatelessWidget {
-  final String image;
-  final String name;
-  final String location;
-  final String rating;
-  final BuildContext context;
-
-  const RestaurantCard({
-    super.key,
-    required this.image,
-    required this.name,
-    required this.location,
-    required this.rating,
-    required this.context,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget restaurantCard(String picture, String restauName, String location, String rating, context, int restauID) {
     return InkWell(
       onTap: () {
         Navigator.push(
-          context, 
-          MaterialPageRoute(builder: (context) => const RestaurantViewPage(restaurateurID: 1,))
+          context,
+          MaterialPageRoute(
+            builder: (context) => RestaurantViewPage(restaurateurID: restauID),
+          ),
         );
       },
       child: Card(
-        elevation: 4.0,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 3,
         child: Column(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                image,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(picture, fit: BoxFit.cover, width: double.infinity),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(location, style: const TextStyle(color: Colors.grey)),
-                    ],
-                  ),
+                  Text(restauName, style: blackBodyTextStyle, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  Text(location, style: grayBodyTextStyle),
                   Row(
                     children: [
-                      Text(rating, style: const TextStyle(fontFamily: 'Sen', fontSize: 16, fontWeight: FontWeight.bold)),
-                      const Icon(Icons.star_rate, color: Colors.orange),
+                      const Icon(Icons.star_rate, color: darkOrangeColor, size: 16),
+                      Text(rating),
                     ],
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class FilterButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const FilterButton({
-    super.key,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Chip(
-          label: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Sen',
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: whiteColor, 
-            ),
-          ),
-          backgroundColor: lightOrangeColor, 
-          side: const BorderSide(color: lightOrangeColor),
         ),
       ),
     );

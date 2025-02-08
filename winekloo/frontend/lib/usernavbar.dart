@@ -5,8 +5,8 @@ import 'package:userworkside/models/foodie_model.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/screens/homescreen/HomeScreen.dart';
 import '/views/screens/homescreen/Search.dart';
-import '/views/screens/homescreen/favorites.dart';
-import '/views/screens/homescreen/profile.dart';
+import 'views/screens/homescreen/Favorites.dart';
+import 'views/screens/homescreen/Profile.dart';
 
 class UserNavBar extends StatefulWidget {
   const UserNavBar({super.key});
@@ -30,7 +30,7 @@ class _UserNavBarState extends State<UserNavBar> {
           }
 
           List<Widget> screens = [
-            const homeScreen(),
+            const Homescreen(),
             const SearchPage(),
             FavoritesPage(foodieID: foodieProfile.foodieID ?? 0),
             const ProfilePage(),

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session
 from datetime import date
 from app.repositories.foodie_repo import FoodieRepository
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.repositories.favorites_repo import add_to_favorites
 import jwt
 import datetime
 SECRET_KEY = "key"
@@ -112,7 +113,6 @@ def signup_foodie():
         foodie_data = request.get_json()
         print(f"Foodie Data: {foodie_data}")
 
-        # Extract data from the request
         full_name = foodie_data.get("full_name")
         email = foodie_data.get("email")
         phone = foodie_data.get("phone")
@@ -123,11 +123,9 @@ def signup_foodie():
         dietary_options = foodie_data.get("dietaryOptions")
         pricing = foodie_data.get("pricing")
 
-        # Check if the foodie already exists
         if FoodieRepository.get_foodie_by_email(email):
             return jsonify({"error": "Foodie with this email already exists"}), 400
 
-        # Hash the password before storing it
         hashed_password = generate_password_hash(password)
         
         foodie_data = {
@@ -144,10 +142,6 @@ def signup_foodie():
 
         foodie = FoodieRepository.add_foodie(foodie_data)
 
-        print(f"Foodie Data: {foodie_data}")
-        print(f"Pricing found: {pricing}")
-
-        # Save the foodie ID in the session after successful registration
         session['Foodie_id'] = foodie.FoodieID
 
         return jsonify({"message": "Foodie created successfully", "foodie": foodie.to_json()}), 201
@@ -165,3 +159,24 @@ def check_foodie_by_email(email):
         return jsonify({"message": "Foodie exists"}), 200
     else:
         return jsonify({"message": "Foodie does not exist"}), 404
+    
+
+@foodie_bp.route("/favorites/<int:restau_id>", methods=["POST"])
+def add_to_favorites_route(restau_id):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        foodie_id = decoded["Foodie_id"]
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+    add_to_favorites(foodie_id, restau_id)
+    
+    return jsonify({"message": "Successfully added to favorites!"}), 201

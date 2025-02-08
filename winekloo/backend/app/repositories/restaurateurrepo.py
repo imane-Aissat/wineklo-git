@@ -10,6 +10,10 @@ class RestaurateurRepository:
     @staticmethod
     def get_restaurateur_by_id(restaurateur_id):
         return Restaurateur.query.filter_by(RestaurateurID=restaurateur_id).first()
+    
+    @staticmethod
+    def get_restaurateur_by_email(email):
+        return Restaurateur.query.filter_by(Email=email).first()
 
     @staticmethod
     def get_all_restaurateurs():

@@ -6,9 +6,8 @@ import '../models/dietarypreferences_model.dart';
 class DietaryPreferencesCubit extends Cubit<List<DietaryPreferences>> {
   DietaryPreferencesCubit() : super([]);
 
-  static const String baseUrl = "http://127.0.0.1:5000"; // Adjust based on your backend
+  static const String baseUrl = "http://127.0.0.1:5000";
 
-  // Load all dietary preferences
   Future<void> loadDietaryPreferences() async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/dietary_preferences"));
@@ -26,7 +25,6 @@ class DietaryPreferencesCubit extends Cubit<List<DietaryPreferences>> {
     }
   }
 
-  // Load dietary preference by ID
   Future<void> loadDietaryPreferenceById(int dietaryPreferenceId) async {
   if (dietaryPreferenceId == 0) {
     emit([]);
@@ -39,7 +37,6 @@ class DietaryPreferencesCubit extends Cubit<List<DietaryPreferences>> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       
-      // ✅ Convert single object to a list
       final dietaryPreference = DietaryPreferences.fromJson(data);
       emit([dietaryPreference]);  
       
