@@ -137,7 +137,7 @@ class _HomescreenState extends State<Homescreen> {
                     itemBuilder: (context, index) {
                       final restau = filteredList[index];
                       return restaurantCard(
-                        restau.photo ?? "no photo",
+                        restau.photo ?? "assets/images/bg.png",
                         restau.name ?? "no name",
                         restau.location ?? "no location",
                         restau.ratingValueAverage.toString(),
@@ -194,12 +194,12 @@ class _HomescreenState extends State<Homescreen> {
       elevation: 3,
       child: Column(
         children: [
-          // Responsive Image Section
+          
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(screenWidth * 0.03)),
               child: Image.asset(
-                picture,
+                picture ,
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
