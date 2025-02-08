@@ -3,16 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 import '/views/screens/food_managment/my_reviews.dart';
-import '../../../bloc/restaurateur_cubit.dart'; 
-import '../../../models/restaurateur.dart'; 
+import '../../../bloc/restaurateur_cubit.dart';
+import '../../../models/restaurateur.dart';
+import '../../../bloc/categories_cubit.dart';
+import '../../../models/categories_model.dart';
+import '../../../bloc/specialfeatures_cubit.dart';
+import '../../../models/specialfeatures_model.dart';
 
 class RestaurantViewPage extends StatelessWidget {
   const RestaurantViewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => RestaurateurCubit()..loadRestaurateur(9), // Load restaurateur ID 5
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => RestaurateurCubit()..loadRestaurateur(9)),
+        BlocProvider(create: (context) => CategoriesCubit()),
+        BlocProvider(create: (context) => SpecialFeaturesCubit()),
+      ],
       child: Scaffold(
         body: BlocBuilder<RestaurateurCubit, Restaurateur?>(
           builder: (context, restaurateur) {
@@ -20,23 +28,39 @@ class RestaurantViewPage extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
-            return buildRestaurantView(
-              context: context,
-              restaurantName: restaurateur.name ?? 'Unknown',
-              description: restaurateur.description ?? 'No description available',
-              imagePath: restaurateur.photo ?? 'assets/images/default.jpg',
-              rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
-              location: restaurateur.location ?? 'Unknown location',
-              pricing: getPricingSymbol(restaurateur.pricing),
-              categories: getCategoryList(restaurateur.categories),
-              dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
-              specialFeatures: getFeatureList(restaurateur.specialFeatures),
-              menuItems: [
-                {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
-                {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
-              ],
-              openingHours: convertWorkingHours(restaurateur.workingHours),
-            );
+            // Load categories by restaurateur.categories ID
+            final categoriesCubit = context.read<CategoriesCubit>();
+            categoriesCubit.loadCategoryById(restaurateur.categories ?? 0);
+            // Load categories by restaurateur.specialfeatures ID
+            final specialfeatures = context.read<SpecialFeaturesCubit>();
+            specialfeatures.loadSpecialFeaturesById(restaurateur.specialFeatures ?? 0);
+    
+            return BlocBuilder<CategoriesCubit, List<Categories>>(
+  builder: (context, categories) {
+    return BlocBuilder<SpecialFeaturesCubit, List<SpecialFeatures>>(
+      builder: (context, specialFeatures) {
+        return buildRestaurantView(
+          context: context,
+          restaurantName: restaurateur.name ?? 'Unknown',
+          description: restaurateur.description ?? 'No description available',
+          imagePath: restaurateur.photo ?? 'assets/images/default.jpg',
+          rating: double.tryParse(restaurateur.ratingValueAverage ?? '0') ?? 0.0,
+          location: restaurateur.location ?? 'Unknown location',
+          pricing: getPricingSymbol(restaurateur.pricing),
+          categories: getCategoryList(categories),
+          specialFeatures: getSpecialFeaturesList(specialFeatures), // Now using the correct state
+          dietaryOptions: getDietaryList(restaurateur.dietaryPreferences),
+          menuItems: [
+            {'imagePath': 'assets/images/pizza.jpg', 'itemName': 'Pizza', 'price': '600'},
+            {'imagePath': 'assets/images/pasta.jpg', 'itemName': 'Pasta', 'price': '1400'},
+          ],
+          openingHours: convertWorkingHours(restaurateur.workingHours),
+        );
+      },
+    );
+  },
+);
+
           },
         ),
       ),
@@ -44,30 +68,31 @@ class RestaurantViewPage extends StatelessWidget {
   }
 
   Map<String, String> convertWorkingHours(Map<String, dynamic>? workingHours) {
-  if (workingHours == null) return {};
-  return workingHours.map((key, value) => MapEntry(key, value.toString()));
-}
-
+    if (workingHours == null) return {};
+    return workingHours.map((key, value) => MapEntry(key, value.toString()));
+  }
 
   String getPricingSymbol(int? pricing) {
     if (pricing == null) return '\$';
     return '\$' * pricing;
   }
 
-  List<String> getCategoryList(int? categories) {
-    return categories != null ? ['Category $categories'] : ['Unknown Category'];
+  List<String> getCategoryList(List<Categories> categories) {
+    return categories.isNotEmpty ? categories.map((c) => c.categoryName ?? 'Unknown').toList() : ['Unknown Category'];
+  }
+
+
+
+  List<String> getSpecialFeaturesList(List<SpecialFeatures> specialfeatures) {
+    return specialfeatures.isNotEmpty ? specialfeatures.map((c) => c.feature ?? 'Unknown').toList() : ['Unknown specialfeatures'];
   }
 
   List<String> getDietaryList(int? dietaryPreferences) {
     return dietaryPreferences != null ? ['Dietary $dietaryPreferences'] : ['All'];
   }
 
-  List<String> getFeatureList(int? specialFeatures) {
-    return specialFeatures != null ? ['Feature $specialFeatures'] : ['No special features'];
-  }
+ 
 }
-
-
 
 class OpeningHoursCard extends StatelessWidget {
   final Map<String, String> openingHours;
@@ -291,83 +316,7 @@ class ReviewCard extends StatelessWidget {
 
 
 
-class MenuCard extends StatelessWidget {
-  final String imagePath;
-  final String itemName;
-  final String price;
 
-  const MenuCard({
-    super.key,
-    required this.imagePath,
-    required this.itemName,
-    required this.price,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Container(
-      width: screenWidth * 0.4, 
-      height: screenWidth * 0.5, 
-      margin: EdgeInsets.all(screenWidth * 0.02), 
-      decoration: cardDecoration,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(screenWidth * 0.02),
-            ), 
-            child: Image.asset(
-              imagePath,
-              height: screenWidth * 0.3,
-              width: double.infinity,
-              fit: BoxFit.fill,
-            ),
-          ),
-          const SizedBox(height: 8.0),
-          
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-            child: Text(
-              itemName,
-              style: bodyTextStyle.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: screenWidth * 0.04, 
-              ),
-            ),
-          ),
-          const SizedBox(height: 4.0),
-          
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Starting',
-                  style: placeholderTextStyle.copyWith(
-                    fontSize: screenWidth * 0.035, 
-                  ),
-                ),
-                Text(
-                  '$price DZD',
-                  style: bodyTextStyle.copyWith(
-                    color: darkOrangeColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: screenWidth * 0.04, 
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 
 
@@ -506,37 +455,22 @@ Widget buildRestaurantView({
 
                   child: Row(
                     children: [
-                      Text('See All', style: bodyTextStyle.copyWith(color: darkOrangeColor)),
-                      const Icon(Icons.arrow_forward, color: darkOrangeColor, size: 16.0),
+                      Text('', style: bodyTextStyle.copyWith(color: darkOrangeColor)),
+                    
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16.0),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: menuItems.map((item) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: MenuCard(
-                    imagePath: item['imagePath']!,
-                    itemName: item['itemName']!,
-                    price: item['price']!,
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+          
           const SizedBox(height: 16.0),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
               icon: Icon(Icons.download, color: Colors.white),
               label: Text(
-                'Download Menu',
+                'See Menu',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(

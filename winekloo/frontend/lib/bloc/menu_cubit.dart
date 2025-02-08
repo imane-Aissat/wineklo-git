@@ -32,7 +32,7 @@ class MenuCubit extends Cubit<List<Menu>> {
     try {
       emit([]);  // Show loading state
       final response = await http.get(Uri.parse("$baseUrl/menu/restaurant/$restaurantId"));
-      
+
       print("API Response: ${response.body}"); // Debugging
 
       if (response.statusCode == 200) {
@@ -74,7 +74,7 @@ class MenuCubit extends Cubit<List<Menu>> {
 
 
   // ✅ Create a new menu item
- 
+
   Future<void> createMenu(Menu newItem) async {
   try {
     final response = await http.post(
@@ -96,7 +96,6 @@ class MenuCubit extends Cubit<List<Menu>> {
   }
 }
 
-// ✅ Update an existing menu item
 Future<void> updateMenu(Menu updatedMenu) async {
   try {
     final response = await http.put(
@@ -104,7 +103,6 @@ Future<void> updateMenu(Menu updatedMenu) async {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(updatedMenu.toJson()),
     );
-
     if (response.statusCode == 200) {
       // Find the index of the updated item in the state list
       final updatedList = state.map((menu) => menu.menuID == updatedMenu.menuID ? updatedMenu : menu).toList();
@@ -117,12 +115,10 @@ Future<void> updateMenu(Menu updatedMenu) async {
   }
 }
 
-// ✅ Delete a menu item
 Future<void> deleteMenu(int menuID) async {
   try {
     final response = await http.delete(Uri.parse("$baseUrl/menu/delete/$menuID"));
-
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
       final updatedList = state.where((menu) => menu.menuID != menuID).toList();
       emit(updatedList);  // Remove deleted item from state
     } else {

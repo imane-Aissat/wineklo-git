@@ -28,3 +28,24 @@ def get_all_fav_restau(id):
     return jsonify([restaurateur.to_json() for restaurateur in favoriteRestaurateurs]), 200
 
                
+@restaurateur_bp.route('/restaurateur/<int:id>', methods=['PUT'])
+def update_restaurateur(id):
+    data = request.get_json()
+    
+    # Validate required fields
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    restaurateur = RestaurateurRepository.get_restaurateur_by_id(id)
+    
+    if not restaurateur:
+        return jsonify({"error": "Restaurateur not found"}), 404
+
+    # Update fields if provided
+    restaurateur.name = data.get('name', restaurateur.name)
+    restaurateur.description = data.get('description', restaurateur.description)
+    restaurateur.location = data.get('location', restaurateur.location)
+    restaurateur.pricing = data.get('pricing', restaurateur.pricing)
+    restaurateur.workingHours = data.get('workingHours', restaurateur.workingHours)
+    updated_restaurateur = RestaurateurRepository.update_restaurateur(restaurateur)
+    return jsonify(updated_restaurateur.to_json()), 200

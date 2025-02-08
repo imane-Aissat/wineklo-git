@@ -6,7 +6,6 @@ class Menu {
    String? details;
    String?category;
    String? picture;
-
   Menu({
      this.menuID,
      required this.restaurateurID,
@@ -16,7 +15,6 @@ class Menu {
      this.category,
      this.picture,
   });
-
   // Convert JSON to Model
   factory Menu.fromJson(Map<String, dynamic> json) {
     return Menu(
@@ -29,7 +27,6 @@ class Menu {
       picture: json['Picture'],
     );
   }
-
   // Convert Model to JSON
   Map<String, dynamic> toJson() {
     return {
