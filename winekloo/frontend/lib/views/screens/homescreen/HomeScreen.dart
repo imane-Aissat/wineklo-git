@@ -28,6 +28,7 @@ class _HomescreenState extends State<Homescreen> {
     7: "Healthy",
     8: "Mexican",
     9: "Vegetarian",
+    10: "Café"
   };
 
   @override
