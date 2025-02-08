@@ -64,6 +64,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
+                       backgroundImage: foodieProfile.photo != null &&
+                                      foodieProfile.photo!.isNotEmpty
+                                  ? AssetImage(foodieProfile.photo!)
+                                  : const AssetImage(
+                                          "assets/images/defaultprofilepic.jpg")
+                                      as ImageProvider,
                     radius: screenWidth * 0.08,
                     backgroundColor: lightGrayColor,
                   ),

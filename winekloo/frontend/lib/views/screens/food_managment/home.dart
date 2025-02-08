@@ -12,7 +12,7 @@ import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
 
 class RestaurantDashboardPage extends StatelessWidget {
-  //final int restaurateurID; // Pass the restaurateur ID
+  //final int restaurateurID;
   const RestaurantDashboardPage({super.key});
 
   @override
@@ -37,17 +37,14 @@ class RestaurantDashboardPage extends StatelessWidget {
               ),
               const SizedBox(height: 16.0),
 
-              /// **Quick Access Buttons**
               _buildQuickAccessSection(context),
 
               const SizedBox(height: 24.0),
 
-              /// **Review Statistics**
               _buildReviewStatisticsSection(),
 
               const SizedBox(height: 24.0),
 
-              /// **Review Comments**
               _buildReviewCommentsSection(context),
             ],
           ),
@@ -56,7 +53,6 @@ class RestaurantDashboardPage extends StatelessWidget {
     );
   }
 
-  /// **Quick Access Section**
   Widget _buildQuickAccessSection(BuildContext context) {
     return Container(
       decoration: cardDecoration,
@@ -84,7 +80,6 @@ class RestaurantDashboardPage extends StatelessWidget {
     );
   }
 
-  /// **Review Statistics Section**
   Widget _buildReviewStatisticsSection() {
     return Container(
       decoration: cardDecoration,
@@ -132,7 +127,7 @@ class RestaurantDashboardPage extends StatelessWidget {
     );
   }
 
-  /// **Review Comments Section**
+  
   Widget _buildReviewCommentsSection(BuildContext context) {
     return BlocBuilder<ReviewsCubit, List<Review>>(
       builder: (context, reviews) {
@@ -147,10 +142,9 @@ class RestaurantDashboardPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             ...reviews.take(3).map((review) => ListTile(
                   title:  Text(
-  '${review.foodieName} - ${(review.date != null ? DateTime.parse(review.date!).toLocal().toString().split(' ')[0] : '')}',
-  style: subheadingStyle,
-),
-
+                    '${review.foodieName} - ${(review.date != null ? DateTime.parse(review.date!).toLocal().toString().split(' ')[0] : '')}',
+                    style: subheadingStyle,
+                  ),
                   subtitle: Text(review.comment ?? 'No comment'),
                 )),
             Align(

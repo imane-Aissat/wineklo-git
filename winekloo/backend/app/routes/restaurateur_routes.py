@@ -40,17 +40,17 @@ def login_restaurateur():
             return jsonify({"error": "Email and password are required"}), 400
 
         restaurateur = RestaurateurRepository.get_restaurateur_by_email(email)
-
         if not restaurateur or restaurateur.Password != password:
             return jsonify({"error": "Invalid email or password"}), 401
         
         if restaurateur:
-                    token = jwt.encode(
-                            {"Restaurateur_id": restaurateur.RestaurateurID, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)},
-                            SECRET_KEY,
-                            algorithm="HS256"
-                    )
-                    return jsonify({"token": token, "restaurateur": restaurateur.to_json()}), 200
+            token = jwt.encode(
+                {"Restaurateur_id": restaurateur.RestaurateurID, "role": "restaurateur", "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)},
+                SECRET_KEY,
+                algorithm="HS256"
+            )
+            return jsonify({"token": token, "role": "restaurateur", "restaurateur": restaurateur.to_json()}), 200
+
 
         return jsonify({"error": "Invalid credentials"}), 401
     
@@ -68,6 +68,8 @@ def get_logged_in_restaurateur():
     token = auth_header.split(" ")[1]
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        print("hola me esta decoded :")
+        print(decoded)
         restaurateur = RestaurateurRepository.get_restaurateur_by_id(decoded["Restaurateur_id"])
         return jsonify(restaurateur.to_json()), 200
     except jwt.ExpiredSignatureError:

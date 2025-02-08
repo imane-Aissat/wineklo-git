@@ -87,6 +87,12 @@ class _EditProfileState extends State<EditProfile> {
                           CircleAvatar(
                             radius: screenWidth * 0.12,
                             backgroundColor: lightGrayColor,
+                             backgroundImage: foodie.photo != null &&
+                                      foodie.photo!.isNotEmpty
+                                  ? AssetImage(foodie.photo!)
+                                  : const AssetImage(
+                                          "assets/images/defaultprofilepic.jpg")
+                                      as ImageProvider,
                           ),
                           Positioned(
                             bottom: 0,

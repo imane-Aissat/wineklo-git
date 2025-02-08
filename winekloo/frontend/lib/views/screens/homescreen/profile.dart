@@ -70,16 +70,16 @@ class ProfilePage extends StatelessWidget {
                                       foodieProfile.photo!.isNotEmpty
                                   ? AssetImage(foodieProfile.photo!)
                                   : const AssetImage(
-                                          "assets/images/snoopya.jpg")
+                                          "assets/images/defaultprofilepic.jpg")
                                       as ImageProvider,
                             ),
                           ),
-                          SizedBox(height: screenHeight * 0.01),
+                          SizedBox(height: screenHeight * 0.03),
                           Text(
                             foodieProfile.fullname ?? "Unnamed User",
                             style: blackSubHeadlineStyle,
                           ),
-                          SizedBox(height: screenHeight * 0.01),
+                          SizedBox(height: screenHeight * 0.03),
                           SizedBox(
                             width: screenWidth * 0.35,
                             height: screenHeight * 0.06,
