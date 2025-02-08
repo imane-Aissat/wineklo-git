@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:userworkside/views/screens/Homescreen/Search.dart';
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
-import '/views/screens/Homescreen/restau%20profile.dart';
+import '/views/screens/Homescreen/RestaurantProfile.dart';
 import '../../../bloc/foodie_cubit.dart';
 import '../../../bloc/restaurateurs_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
