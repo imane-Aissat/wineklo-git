@@ -119,32 +119,32 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: blackSubHeadlineStyle,
                         ),
                         SizedBox(width: screenWidth * 0.55),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FavoritesPage(foodieID: foodieProfile.foodieID ?? 0)),
-                            );
-                          },
-                          child: Text(
-                            "See All",
-                            style: orangeBodyTextStyle.copyWith(
-                                fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.01),
-                  const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
                         
                       ],
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.01),
+                   
+                   Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FavoritesPage(foodieID: foodieProfile.foodieID ?? 0)),
+                            );
+                        },
+                        
+                        style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+                        backgroundColor: lightOrangeColor,
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                        shadowColor: darkOrangeColor,
+                        elevation: 4.0,
+                        ),
+                        child: const Text("Check out all your favorites" , style: whiteSubheadingStyle),),
+                    ),
+                  
                   SizedBox(height: screenHeight * 0.03),
                 ],
               ),
