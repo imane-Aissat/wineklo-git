@@ -30,6 +30,11 @@ class MenuCubit extends Cubit<List<Menu>> {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+
+  // ✅ Fetch menus by restaurant ID
+>>>>>>> Stashed changes
   Future<void> fetchMenusByRestaurantId(int restaurantId) async {
     try {
       emit([]);  
@@ -82,7 +87,12 @@ class MenuCubit extends Cubit<List<Menu>> {
   }
 
 
+<<<<<<< Updated upstream
 
+=======
+   
+  // Get menu by ID with loading feedback
+>>>>>>> Stashed changes
   Future<void> getMenuById(int menuID) async {
     try {
       emit([]);  

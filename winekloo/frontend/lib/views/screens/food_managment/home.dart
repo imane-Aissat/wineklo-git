@@ -10,6 +10,8 @@ import '/views/screens/food_managment/add_new_item.dart';
 import '/views/screens/food_managment/my_reviews.dart'; 
 import '/views/themes/styles/colors.dart';
 import '/views/themes/styles/styles.dart';
+import '../../../bloc/reviews_cubit.dart';
+import '../../../models/reviews_model.dart';
 
 class RestaurantDashboardPage extends StatelessWidget {
   //final int restaurateurID;
